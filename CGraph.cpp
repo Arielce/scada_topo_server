@@ -7,6 +7,7 @@
 
 #include "CGraph.h"
 #include <iostream>
+#include <assert.h>
 namespace SCADA_ALG
 {
     CPropertyContainer::CPropertyContainer()
@@ -47,15 +48,19 @@ namespace SCADA_ALG
     {
         m_graph = graph;
     }
+    CGraph* CPropertyContainer::getGraph()
+    {
+    		return m_graph;
+    }
 
     //CVertex
     CVertex::CVertex()
-        :m_vetexId(-1),m_iDegree(0),m_island(NULL)
+        :m_vetexId(-1),m_iDegree(0)
     {
 
     }
     CVertex::CVertex(const SCA_ND_ID id)
-        :m_vetexId(id),m_iDegree(0),m_island(NULL)
+        :m_vetexId(id),m_iDegree(0)
     {
 
     }
@@ -113,9 +118,28 @@ namespace SCADA_ALG
         }
         return this;
     }
-    CIsland* CVertex::belongToIsland()
+    void CVertex::addIsland(CIsland* island)
     {
-    		return m_island;
+    		assert(island);
+    		map<CGraph*,CIsland*>::iterator it_map = m_mapGraphIsland.find(island->getGraph());
+    		if (it_map != m_mapGraphIsland.end())
+    		{
+    			it_map->second = island;
+    		}
+    		else
+    		{
+    			m_mapGraphIsland.insert( make_pair(island->getGraph(),island) );
+    		}
+    		return;
+    }
+    CIsland* CVertex::belongToIsland( CGraph* const g )
+    {
+    		map<CGraph*,CIsland*>::iterator it_map = m_mapGraphIsland.find(g);
+    		if (it_map != m_mapGraphIsland.end())
+    		{
+    			return it_map->second;
+    		}
+    		return NULL;
     }
     //不要直接调用freeVertex释放vertex，由edge调用（即：图管理时仅需释放边，无需释放点）
     void CVertex::freeVertex()
@@ -236,14 +260,18 @@ namespace SCADA_ALG
     		vec_label = m_vecLabels;
     		return m_vecLabels.size();
     }
-
-    CIsland::CIsland():m_islandId(-1)
+//island
+    CIsland::CIsland():m_islandId(-1),m_parentIsland(NULL)
     {
-
+    		setGraph(NULL);
     }
-    CIsland::CIsland(const int island_no):m_islandId(island_no)
+    CIsland::CIsland(CGraph* g):m_islandId(-1),m_parentIsland(NULL)
+    {
+    		setGraph(g);
+    }
+    CIsland::CIsland(CGraph* g,const int island_no):m_islandId(island_no),m_parentIsland(NULL)
 	{
-
+    		setGraph(g);
 	}
     CIsland::~CIsland()
     {
@@ -254,13 +282,69 @@ namespace SCADA_ALG
     		vec_vertex = m_vecVertex;
     		return m_vecVertex.size();
     }
-    void CIsland::mergeIsland(CIsland* t_island)
+    CIsland* CIsland::getParent()
     {
-    		vector<CVertex*> vec_vertex;
-    		int num = t_island->getAllVertex(vec_vertex);
-    		if (num > 0)
+    		return m_parentIsland;
+    }
+    void CIsland::setParent(CIsland* island)
+    {
+    		m_parentIsland = island;
+    		island->addSubIsland(this);
+    }
+    void CIsland::addSubIsland(CIsland* island)
+    {
+    		m_subIsland.push_back(island);
+    }
+    vector<CIsland*> CIsland::getSubIsland()
+    	{
+    		return m_subIsland;
+    	}
+    void CIsland::mergeIsland(CIsland* t_island,CGraph* graph)
+    {
+    		if (m_parentIsland == NULL && t_island->getParent() == NULL)
     		{
-    			m_vecVertex.insert(m_vecVertex.end(),vec_vertex.begin(),vec_vertex.end());
+    			//CIsland* parent = new CIsland();
+    			CIsland* parent = graph->createIsland();//用大图来创建岛
+    			setParent(parent);
+    			t_island->setParent(parent);
+    			parent->appendVertexs(m_vecVertex);
+    			vector<CVertex*> vec_vertex;
+    			int num = t_island->getAllVertex(vec_vertex);
+    			parent->appendVertexs(vec_vertex);
+    			return;
+    		}
+    		else if ( m_parentIsland )
+    		{
+    			CIsland* parent = m_parentIsland;
+    			t_island->setParent(parent);
+    			vector<CVertex*> vec_vertex;
+    			int num = t_island->getAllVertex(vec_vertex);
+    			parent->appendVertexs(vec_vertex);
+
+    			CIsland* t_parent = t_island->getParent();
+    			if (t_parent)
+    			{
+    				vector<CIsland*>::iterator it_sub;
+    				vector<CIsland*> vec_sub = t_island->getParent()->getSubIsland();
+    				for (it_sub = vec_sub.begin();it_sub != vec_sub.end();it_sub++)//合并与t_island相连子岛的节点
+    				{
+    					if (*it_sub == t_island)
+    						continue;
+    					(*it_sub)->setParent(parent);
+    					vector<CVertex*> vec_vertex;
+    					(*it_sub)->getAllVertex(vec_vertex);
+    					parent->appendVertexs(vec_vertex);
+    				}
+    				delete t_parent;
+    				t_parent = NULL;
+    			}
+    			return;
+    		}
+    		else
+    		{
+    			CIsland* parent = t_island->getParent();
+    			setParent(parent);
+    			parent->appendVertexs(m_vecVertex);
     		}
     }
     void CIsland::appendVertex(CVertex* v)
@@ -268,6 +352,16 @@ namespace SCADA_ALG
     		if (v != NULL)
     		{
     			m_vecVertex.push_back(v);
+    			v->addIsland(this);
+    		}
+    }
+    void CIsland::appendVertexs(vector<CVertex*>& vec_vertex)
+    {
+    		//m_vecVertex.insert( m_vecVertex.end(),vec_vertex.begin(),vec_vertex.end() );
+    		vector<CVertex*>::iterator it;
+    		for (it = vec_vertex.begin();it != vec_vertex.end(); it++)
+    		{
+    			appendVertex(*it);
     		}
     }
     //label
@@ -299,7 +393,7 @@ namespace SCADA_ALG
     CGraph::~CGraph()
     {
         // TODO Auto-generated destructor stub
-        freeGraph();
+        //freeGraph();
     }
 
     CVertex* CGraph::createVertex(const SCA_ND_ID id)
@@ -314,9 +408,23 @@ namespace SCADA_ALG
         }
         return vptr;
     }
+    /*
     void CGraph::releaseVertex(const SCA_ND_ID id)
     {
-
+    		CVertex* v = findVertexById(id);
+    		if (v)
+    		{
+    			v->freeVertex();
+    		}
+    }
+    */
+    void CGraph::releaseEdge(const SCA_ID id)
+    {
+    		CEdge* e = findEdgeById(id);
+    		if (e)
+    		{
+    			e->freeEdge();
+    		}
     }
     CVertex* CGraph::findVertexById(const SCA_ND_ID id)
     {
@@ -340,6 +448,13 @@ namespace SCADA_ALG
         }
         return NULL;
     }
+    CIsland* CGraph::createIsland( const int island_no )
+    {
+    		CIsland* island = new CIsland(this,island_no);
+    		assert(island);
+    		m_vecIsland.push_back( island );
+    		return island;
+    }
     vector<CVertex*> CGraph::getAllVertex()
     {
         return m_vecVertex;
@@ -354,22 +469,50 @@ namespace SCADA_ALG
     }
     void CGraph::freeGraph()
     {
-    		/*
-        vector<CVertex*>::iterator it_v = m_vecVertex.begin();
-        for (;it_v != m_vecVertex.end();it_v++)
-        {
-            delete *it_v;
-        }
-        m_vecVertex.clear();
-    	 	 */
+    		//free edge
         vector<CEdge*>::iterator it_e = m_vecEdge.begin();
         for (;it_e != m_vecEdge.end();it_e++)
         {
-            delete *it_e;
+        		if (*it_e)
+        		{
+        			printf("free edge %ld\n",(*it_e)->getId());
+        			delete *it_e;
+        			*it_e = NULL;
+        		}
         }
         m_vecEdge.clear();
+        //free label
+        vector<CLabel*>::iterator it_l = m_vecLabel.begin();
+        for(;it_l != m_vecLabel.end();it_l++)
+        {
+        		if (*it_l)
+        		{
+        			delete *it_l;
+        			*it_l = NULL;
+        		}
+        }
+        //free island
+        vector<CIsland*>::iterator it_i = m_vecIsland.begin();
+        for(;it_i != m_vecIsland.end();it_i++)
+        {
+        		if (*it_i)
+        		{
+        			delete *it_i;
+        			*it_i = NULL;
+        		}
+        }
     }
-    int CGraph::addVertex(CVertex* v)
+    //sub graph
+    CSubGraph::CSubGraph()
+    {
+
+    }
+    CSubGraph::~CSubGraph()
+    {
+
+    }
+
+    int CSubGraph::addVertex(CVertex* v)
     {
     		CVertex* vptr = findVertexById(v->getId());
     		if (vptr == NULL)
@@ -383,7 +526,7 @@ namespace SCADA_ALG
 		}
 		return m_vecVertex.size();
     }
-    void CGraph::delVertex(CVertex* v)
+    void CSubGraph::delVertex(CVertex* v)
     {
     		SCA_ND_ID id = v->getId();
     		CVertex* vptr = findVertexById(id);
@@ -400,7 +543,7 @@ namespace SCADA_ALG
     			}
     		}
     }
-    int CGraph::addEdge(CEdge* e)
+    int CSubGraph::addEdge(CEdge* e)
     {
     		CEdge* eptr = findEdgeById(e->getId());
     		if (eptr == NULL)
@@ -414,7 +557,7 @@ namespace SCADA_ALG
     		}
     		return m_vecEdge.size();
     }
-    void CGraph::delEdge(CEdge* e)
+    void CSubGraph::delEdge(CEdge* e)
     {
     		SCA_ID id = e->getId();
     		CEdge* eptr = findEdgeById(id);
@@ -430,6 +573,31 @@ namespace SCADA_ALG
     				m_mapIndexEdge.erase(it_map);
     			}
     		}
+    }
+    CVertex* CSubGraph::createVertex(const SCA_ND_ID id)
+    {
+    		return NULL;
+    }
+    void CSubGraph::releaseVertex(const SCA_ND_ID id)
+    {
+    		return;
+    }
+    void CSubGraph::releaseEdge(const SCA_ID id)
+    {
+    		return;
+    }
+    void CSubGraph::freeGraph()
+    {
+    		//free island
+        vector<CIsland*>::iterator it_i = m_vecIsland.begin();
+        for(;it_i != m_vecIsland.end();it_i++)
+        {
+        		if (*it_i)
+        		{
+        			delete *it_i;
+        			*it_i = NULL;
+        		}
+        }
     }
 
 

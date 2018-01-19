@@ -52,6 +52,7 @@ namespace SCADA_ALG
         bool hasProperty(const string pname);
 
         void setGraph(CGraph* graph);
+        CGraph* getGraph();
     protected:
         map<string,CUDataValue> m_mapProperty;
         CGraph* m_graph;
@@ -68,7 +69,8 @@ namespace SCADA_ALG
         SCA_ND_ID getId();
         vector<CEdge*>& getEdges();
         int getDegree();
-        CIsland* belongToIsland();
+        CIsland* belongToIsland(CGraph* const g);
+        void addIsland(CIsland* island);
 
     private:
         void freeVertex();
@@ -79,7 +81,7 @@ namespace SCADA_ALG
         SCA_ND_ID m_vetexId;
         vector<CEdge*> m_vecEdge;
         int m_iDegree;
-        CIsland* m_island;
+        map<CGraph*,CIsland*> m_mapGraphIsland;
     };
     class SCADA_ALG_API CEdge : public CPropertyContainer
     {
@@ -128,22 +130,41 @@ namespace SCADA_ALG
     };
 /*
  * 岛，表示通过可联通的边连接在一起的点集
+ * 岛必须属于某一幅图
  * */
     class CIsland : public CPropertyContainer
     {
     public:
     		friend class CVertex;
     	    friend class CEdge;
-    		CIsland();
-    		CIsland(const int island_no);
+    	    friend class CGraph;
+
     		virtual ~CIsland();
-    		void mergeIsland(CIsland* t_island);
+    		/*
+    		 * 岛合并，合并后的岛放在图graph中
+    		 * */
+    		void mergeIsland(CIsland* t_island,CGraph* graph);
     		void appendVertex(CVertex* v);
+    		void appendVertexs(vector<CVertex*>& vec_vetex);
     		int getAllVertex(vector<CVertex*>& vec_vertex);
 
+    		CIsland* getParent();
+    		void setParent(CIsland* island);
+
+    		vector<CIsland*> getSubIsland();
+    		void addSubIsland(CIsland* island);
+
     private:
-    		int m_islandId;
+    		//不允许在外部创建
+    		CIsland();
+		CIsland(CGraph* graph);
+		CIsland(CGraph* graph,const int island_no = 0);
+
+    private:
+    		CIsland* m_parentIsland;//唯一的父岛,如果没有则为空
+    		vector<CIsland*> m_subIsland;//多个子岛
     		vector<CVertex*> m_vecVertex;
+    		int m_islandId;
     };
 
     class SCADA_ALG_API CGraph
@@ -156,21 +177,15 @@ namespace SCADA_ALG
         /*
          * 创建图中的节点，指定节点关键字为id
          * */
-        CVertex* createVertex(const SCA_ND_ID id);
+        virtual CVertex* createVertex(const SCA_ND_ID id);
         /*
-         * 释放图中的节点，
+         * 释放图中的节点
          * */
-        void releaseVertex(const SCA_ND_ID id);
-		/*
-		 * 向图中添加和删除已创建的节点，即节点在其它图中被创建，加入到此图中，用于子图的分析
-		 * */
-        int addVertex(CVertex* v);
-        void delVertex(CVertex* v);
+        //virtual void releaseVertex(const SCA_ND_ID id);
         /*
-         * 向图中添加和删除已创建的边，即边在其它图中被创建，加入到此图中，用于子图的分析
+         * 释放图中的边
          * */
-        int addEdge(CEdge* e);
-        void delEdge(CEdge* e);
+        virtual void releaseEdge(const SCA_ID id);
 
         CVertex* findVertexById(const SCA_ND_ID id);
         CEdge* findEdgeById(const SCA_ID id);
@@ -179,8 +194,15 @@ namespace SCADA_ALG
         vector<CEdge*> getAllEdge();
         void mergeGraph(const CGraph* graph);//合并图
 
-        void freeGraph();
-    private:
+        /*
+         * 创建岛
+         * */
+        CIsland* createIsland( const int island_no = 0 );
+        /*
+         * 清空图中的数据，由客户端自己调用，因此在析构前需要手动调用
+         * */
+        virtual void freeGraph();
+    protected:
         //点
         vector<CVertex*> m_vecVertex;
         map<SCA_ND_ID,unsigned int> m_mapIndexVertex;
@@ -191,8 +213,34 @@ namespace SCADA_ALG
         typedef map<SCA_ID,unsigned int>::iterator IterEdgeIdx;
         //标签
         vector<CLabel*> m_vecLabel;
+        map<string,CLabel*> m_mapIndexLabel;
+        typedef map<string,CLabel*>::iterator IterLabelIdx;
         //电气岛
         vector<CIsland*> m_vecIsland;
+    };
+
+    class SCADA_ALG_API CSubGraph : public CGraph
+    {
+    public:
+    		CSubGraph();
+    	    virtual ~CSubGraph();
+    	    /*
+    	     * 子图中不允许创建点、边
+    	     * */
+    	    CVertex* createVertex(const SCA_ND_ID id);
+    	    void releaseVertex(const SCA_ND_ID id);
+    	    void releaseEdge(const SCA_ID id);
+    	    /*
+    	     * 向图中添加和删除已创建的节点，即节点在其它图中被创建，加入到此图中，用于子图的分析
+    	     * */
+    	    int addVertex(CVertex* v);
+    	    void delVertex(CVertex* v);
+    	    /*
+    	     * 向图中添加和删除已创建的边，即边在其它图中被创建，加入到此图中，用于子图的分析
+    	     * */
+    	    int addEdge(CEdge* e);
+    	    void delEdge(CEdge* e);
+    	    void freeGraph();
     };
 
 } /* namespace SCADA_ALG */

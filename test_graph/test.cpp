@@ -6,9 +6,9 @@ using namespace SCADA_ALG;
 int main(int argc,char** argv)
 {
 	CGraph* graph = new CGraph();
-	CGraph* graph1 = new CGraph();
-	CGraph* graph2 = new CGraph();
-	CGraph* graph3 = new CGraph();
+	CSubGraph* graph1 = new CSubGraph();
+	CSubGraph* graph2 = new CSubGraph();
+	CSubGraph* graph3 = new CSubGraph();
 
 	CVertex* va = graph->createVertex(100);
 	CVertex* vb = graph->createVertex(101);
@@ -63,7 +63,10 @@ int main(int argc,char** argv)
 	{
 		if (vecV[i]->hasProperty("graph1"))
 		{
-			printf( "id = %ld , island is %d \n",vecV[i]->getId(),vecV[i]->getProperty("graph1").c_int()  );
+			int sub_island_no = vecV[i]->getProperty("graph1").c_int();
+			printf( "id = %ld , island is %d \n",vecV[i]->getId(), sub_island_no );
+			CIsland* island = graph1->createIsland( 1000 + sub_island_no );
+			island->appendVertex(vecV[i]);
 		}
 	}
 	printf("ae->getOppVertex(va)->getId() = %ld\n",ae->getOppVertex(va)->getId());
@@ -76,7 +79,10 @@ int main(int argc,char** argv)
 	{
 		if (vecV2[i]->hasProperty("graph2"))
 		{
-			printf( "id = %ld , island is %d \n",vecV2[i]->getId(),vecV2[i]->getProperty("graph2").c_int()  );
+			int sub_island_no = vecV2[i]->getProperty("graph2").c_int();
+			printf( "id = %ld , island is %d \n",vecV2[i]->getId(), sub_island_no );
+			CIsland* island = graph2->createIsland( 2000 + sub_island_no );
+			island->appendVertex(vecV2[i]);
 		}
 	}
 	CTopoAlg topo_alg3;
@@ -88,11 +94,66 @@ int main(int argc,char** argv)
 	{
 		if (vecV3[i]->hasProperty("graph3"))
 		{
-			printf( "id = %ld , island is %d \n",vecV3[i]->getId(),vecV3[i]->getProperty("graph3").c_int()  );
+			int sub_island_no = vecV3[i]->getProperty("graph3").c_int();
+			printf( "id = %ld , island is %d \n",vecV3[i]->getId(), sub_island_no  );
+			CIsland* island = graph3->createIsland( 3000 + sub_island_no );
+			island->appendVertex(vecV3[i]);
 		}
 	}
 
+	//ºÏ²¢
+	va->belongToIsland(graph1)->mergeIsland( va->belongToIsland(graph2),graph );
+	vb->belongToIsland(graph2)->mergeIsland( vb->belongToIsland(graph3),graph );
 
+	printf("======graph=====\n");
+	printf("va island addr is %x\n",va->belongToIsland(graph));
+	printf("vb island addr is %x\n",vb->belongToIsland(graph));
+	printf("vc island addr is %x\n",vc->belongToIsland(graph));
+	printf("vd island addr is %x\n",vd->belongToIsland(graph));
+	printf("ve island addr is %x\n",ve->belongToIsland(graph));
+	printf("vf island addr is %x\n",vf->belongToIsland(graph));
+	printf("vg island addr is %x\n",vg->belongToIsland(graph));
+	printf("vh island addr is %x\n",vh->belongToIsland(graph));
+
+	printf("======graph1=====\n");
+	printf("va island addr is %x\n",va->belongToIsland(graph1));
+	printf("vb island addr is %x\n",vb->belongToIsland(graph1));
+	printf("vc island addr is %x\n",vc->belongToIsland(graph1));
+	printf("vd island addr is %x\n",vd->belongToIsland(graph1));
+	printf("ve island addr is %x\n",ve->belongToIsland(graph1));
+	printf("vf island addr is %x\n",vf->belongToIsland(graph1));
+	printf("vg island addr is %x\n",vg->belongToIsland(graph1));
+	printf("vh island addr is %x\n",vh->belongToIsland(graph1));
+
+	printf("======graph2=====\n");
+	printf("va island addr is %x\n",va->belongToIsland(graph2));
+	printf("vb island addr is %x\n",vb->belongToIsland(graph2));
+	printf("vc island addr is %x\n",vc->belongToIsland(graph2));
+	printf("vd island addr is %x\n",vd->belongToIsland(graph2));
+	printf("ve island addr is %x\n",ve->belongToIsland(graph2));
+	printf("vf island addr is %x\n",vf->belongToIsland(graph2));
+	printf("vg island addr is %x\n",vg->belongToIsland(graph2));
+	printf("vh island addr is %x\n",vh->belongToIsland(graph2));
+
+	printf("======graph3=====\n");
+	printf("va island addr is %x\n",va->belongToIsland(graph3));
+	printf("vb island addr is %x\n",vb->belongToIsland(graph3));
+	printf("vc island addr is %x\n",vc->belongToIsland(graph3));
+	printf("vd island addr is %x\n",vd->belongToIsland(graph3));
+	printf("ve island addr is %x\n",ve->belongToIsland(graph3));
+	printf("vf island addr is %x\n",vf->belongToIsland(graph3));
+	printf("vg island addr is %x\n",vg->belongToIsland(graph3));
+	printf("vh island addr is %x\n",vh->belongToIsland(graph3));
+
+	//É¾³ýÍ¼
+	graph->freeGraph();
+	delete graph;
+	graph1->freeGraph();
+	delete graph1;
+	graph2->freeGraph();
+	delete graph2;
+	graph3->freeGraph();
+	delete graph3;
 
 	return 1;
 }
