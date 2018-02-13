@@ -14,7 +14,8 @@
 返回数据有三种: CBuffer、const结构指针、vector。
 返回值：int >=0 获得的记录数,<0 错误。
 */
-
+namespace RTDB_INTERFACE
+{
 template<class DB_MODE, int app_no, int table_id>
 int GetAllRec(const std::string& field_name, CBuffer &get_result)
 {
@@ -26,6 +27,13 @@ template<class DB_MODE, int app_no, int table_id>
 int GetAllRec(const std::vector<int> column_id_vec, CBuffer &get_result)
 {
     static DB_MODE table(app_no, table_id);
+    return table.TableGet(column_id_vec, get_result);
+}
+template<class DB_MODE>
+int GetAllRec(const std::vector<int> column_id_vec, const int app_no, const int table_id,CBuffer &get_result)
+{
+    static DB_MODE table;
+    table.Open(app_no, table_id);//(app_no, table_id);
     return table.TableGet(column_id_vec, get_result);
 }
 
@@ -101,5 +109,5 @@ int GetAllRec(const int app_no, const int table_id, const std::string& field_nam
         return -1;
     }
 }
-
+}
 #endif

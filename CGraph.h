@@ -21,7 +21,7 @@
 
 typedef long SCA_ID;
 typedef long SCA_ND_ID;
-#include <pthread.h>
+#include "PThreads.h"
 #include <vector>
 #include <map>
 #include <queue>
@@ -138,6 +138,7 @@ namespace SCADA_ALG
     		friend class CVertex;
     	    friend class CEdge;
     	    friend class CGraph;
+    	    typedef int ISLAND_ID;
 
     		virtual ~CIsland();
     		/*
@@ -154,6 +155,8 @@ namespace SCADA_ALG
     		vector<CIsland*> getSubIsland();
     		void addSubIsland(CIsland* island);
 
+    		inline const int& getId()const {return m_islandId;};
+
     private:
     		//不允许在外部创建
     		CIsland();
@@ -164,7 +167,7 @@ namespace SCADA_ALG
     		CIsland* m_parentIsland;//唯一的父岛,如果没有则为空
     		vector<CIsland*> m_subIsland;//多个子岛
     		vector<CVertex*> m_vecVertex;
-    		int m_islandId;
+    		ISLAND_ID m_islandId;
     };
 
     class SCADA_ALG_API CGraph
@@ -172,7 +175,7 @@ namespace SCADA_ALG
     public:
         friend class CVertex;
         friend class CEdge;
-        CGraph();
+        CGraph(const std::string& name);
         virtual ~CGraph();
         /*
          * 创建图中的节点，指定节点关键字为id
@@ -197,11 +200,54 @@ namespace SCADA_ALG
         /*
          * 创建岛
          * */
-        CIsland* createIsland( const int island_no = 0 );
+        CIsland* createIsland( const int island_no = -1 );
+        /*
+         * 创建标签
+         * */
+        CLabel* createLabel(const string& name);
         /*
          * 清空图中的数据，由客户端自己调用，因此在析构前需要手动调用
          * */
         virtual void freeGraph();
+
+        static CGraph* getGraph(const std::string& name);
+        inline const std::string& getName() const { return _name; };
+        inline const int& getId()const {return _graphId;};
+
+        void debugPrintGraph();
+
+    private:
+		typedef std::map<std::string, CGraph*> GraphMap;
+
+		static GraphMap& _getAllGraphs();
+		static void _deleteAllGraphs();
+		static void _deleteAllGraphsWOLock(std::vector<CGraph*> &graphs);
+		static void _addGraph(CGraph* graph);
+		static void _removeGraph(CGraph* graph);
+
+		const std::string _name;
+		int _graphId;
+		const int _island_base_no;
+
+	public:
+		class GraphMapStorage
+		{
+		public:
+			CGraph::GraphMap* _allgraphs;// single shared instance, nifty-counter defensed
+			threading::Mutex _graphMapMutex;	// mutex protecting map from multiple thread access
+
+			GraphMapStorage();
+			~GraphMapStorage();
+		};
+		class SCADA_ALG_API GraphMapStorageInitializer
+		{
+		public:
+			GraphMapStorageInitializer();
+			~GraphMapStorageInitializer();
+		};
+	private:
+		static GraphMapStorage &_graphMapStorageInstance;
+
     protected:
         //点
         vector<CVertex*> m_vecVertex;
@@ -217,12 +263,16 @@ namespace SCADA_ALG
         typedef map<string,CLabel*>::iterator IterLabelIdx;
         //电气岛
         vector<CIsland*> m_vecIsland;
+        map<CIsland::ISLAND_ID,unsigned int> m_mapIndexIsland;
+        typedef map<CIsland::ISLAND_ID,unsigned int>::iterator IterIslandIdx;
     };
+
+    static CGraph::GraphMapStorageInitializer graphMapStorageInitializer; // static initializer for every translation unit
 
     class SCADA_ALG_API CSubGraph : public CGraph
     {
     public:
-    		CSubGraph();
+    		CSubGraph(const std::string& name);
     	    virtual ~CSubGraph();
     	    /*
     	     * 子图中不允许创建点、边

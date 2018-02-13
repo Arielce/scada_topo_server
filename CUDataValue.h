@@ -14,7 +14,7 @@ using namespace std;
 
 namespace SCADA_ALG
 {
-
+#if 0
     const short C_DATATYPE_DEFAULT = 0;
     const short C_DATATYPE_STRING = 1;
     const short C_DATATYPE_UCHAR = 2;
@@ -31,46 +31,52 @@ namespace SCADA_ALG
     const short C_DATATYPE_APPID = 13;
     const short C_DATATYPE_UINT = 14;
     const short C_DATATYPE_LONG = 15;
-
+#endif
     class CUDataValue
     {
     public:
+    		enum DATA_TYPE{C_DATATYPE_DEFAULT,C_DATATYPE_STRING,C_DATATYPE_UCHAR,C_DATATYPE_SHORT,C_DATATYPE_INT,
+    			C_DATATYPE_DATETIME,C_DATATYPE_FLOAT,C_DATATYPE_DOUBLE,C_DATATYPE_KEYID,C_DATATYPE_BINARY,C_DATATYPE_TEXT,
+				C_DATATYPE_IMAGE,C_DATATYPE_APPKEYID,C_DATATYPE_APPID,C_DATATYPE_UINT,C_DATATYPE_LONG};
         CUDataValue();
         ~CUDataValue();
         CUDataValue(const CUDataValue&);
         CUDataValue& operator=(const CUDataValue&);
         bool operator==(const CUDataValue&);
+        bool operator<(const CUDataValue&);//为了放入map等容器中
         short dataType();
         bool isInit();
         void clear();
 
-        void c_string(const char*);
-        void c_string(const string&);
+        const CUDataValue& c_string(const char*);
+        const CUDataValue& c_string(const string&);
         const char* c_string()const;
 
         const CUDataValue& c_uchar(const unsigned char);
         const unsigned char c_uchar()const;
 
-        void c_short(const short);
+        const CUDataValue& c_short(const short);
         const short c_short()const;
 
         const CUDataValue& c_int(const int);
         const int c_int()const;
 
-        void c_float(const float);
+        const CUDataValue& c_float(const float);
         const float c_float()const;
 
-        void c_double(const double);
+        const CUDataValue& c_double(const double);
         const double c_double()const;
 
-        void c_default(const char);
+        const CUDataValue& c_default(const char);
         const char c_default()const;
 
-        void c_uint(const unsigned int);
+        const CUDataValue& c_uint(const unsigned int);
         const unsigned int c_uint()const;
 
         const CUDataValue& c_long(const long);
         const long c_long()const;
+
+        static short length(const DATA_TYPE&);
     private:
         union
         {
@@ -85,7 +91,7 @@ namespace SCADA_ALG
             long     c_long;
         }m_value;
         bool m_init;
-        unsigned short m_type;
+        DATA_TYPE m_type;
     };
 
 } /* namespace SCADA_ALG */
