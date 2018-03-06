@@ -19,6 +19,14 @@ CModelContainer::~CModelContainer()
 {
 	// TODO Auto-generated destructor stub
 	//todo Îö¹¹_modelVec
+	vector<CModelObj*>::iterator it;
+	for ( it = _modelVec.begin(); it != _modelVec.end(); it++ )
+	{
+		if (*it)
+		{
+			delete *it;
+		}
+	}
 }
 void CModelContainer::addModelObj(CModelObj& obj)
 {
