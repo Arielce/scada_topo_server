@@ -13,7 +13,7 @@ namespace SCADA_ALG
 CModelFileLoader::CModelFileLoader()
 {
 	// TODO Auto-generated constructor stub
-
+    //add sth
 }
 
 CModelFileLoader::~CModelFileLoader()
