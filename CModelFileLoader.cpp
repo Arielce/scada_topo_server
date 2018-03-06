@@ -30,6 +30,7 @@ void CModelFileLoader::loadOneModelByKey(CModelContainer& container,const string
 }
 void CModelFileLoader::readModelFile(const string& file_name)
 {
+	//todo load models from file
 	return;
 }
 std::auto_ptr<IModelLoader> create_rt_loader()
