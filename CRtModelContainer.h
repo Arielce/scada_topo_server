@@ -29,8 +29,8 @@ public:
 	void debugPrint();
 
 protected:
-	virtual bool transToGraph(CModelObj& obj, CGraph* graph);
-
+	virtual bool addToGraph(CModelObj& obj, CGraph* graph);
+	virtual bool delFromGraph(CModelObj& obj, CGraph* graph);
 
 private:
 	bool checkLinkValid( SCA_ND_ID id );

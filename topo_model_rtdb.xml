@@ -57,7 +57,7 @@
 		<aclinesegment>
 			<tab>414</tab>
 			<field_num>4</field_num>
-			<field name="id" type="15" key="1">1</field>
+			<field name="id" type="15" key="1" sub="1">1</field>
 			<field name="name" type="1" len="64">3</field>
 		</aclinesegment>
 		<aclineend>
@@ -71,7 +71,7 @@
 		<powertransformer>
 			<tab>416</tab>
 			<field_num>4</field_num>
-			<field name="id" type="15" key="1">1</field>
+			<field name="id" type="15" key="1" sub="1">1</field>
 			<field name="name" type="1" len="64">3</field>
 		</powertransformer>
 		<transformerwinding>

@@ -46,6 +46,10 @@ public:
 	{
 		return _mapKv.end();
 	}
+	bool hasProperty(const std::string& t)const
+	{
+		return (find(t) != end());
+	}
 
 	typedef map<string, IPropertyInfo*> PropertyInfoMap; //eg. "id" - propertyinfo , "nd" - propertyinfo
 	typedef map<string, PropertyInfoMap> PropertyTypeInfoMap;  //eg. "breaker"

@@ -26,6 +26,7 @@ void CModelContainer::addModelObj(CModelObj& obj)
 	CModelObj* model_obj = new CModelObj(obj);
 	_modelVec.push_back(model_obj);
 	_modelIndex.insert(make_pair(obj.keyValue(), model_obj));
+	//addToGraph(obj,_graph);
 }
 void CModelContainer::delModelObj(CModelObj& obj)
 {
@@ -39,6 +40,7 @@ void CModelContainer::delModelObj(CModelObj& obj)
 		_modelNum--;
 		_modelIndex.erase(it);
 	}
+	//delFromGraph(obj,_graph);
 }
 void CModelContainer::delModelObjProperty(CModelObj& obj, const string property_name)
 {
@@ -65,9 +67,13 @@ void CModelContainer::updateModelObj(CModelObj& obj)
 		*(*it_vec) = obj;
 	}
 }
-bool CModelContainer::transToGraph(CModelObj& obj, CGraph* graph)
+bool CModelContainer::addToGraph(CModelObj& obj, CGraph* graph)
 {
 	//留给子类实现
+	return false;
+}
+bool CModelContainer::delFromGraph(CModelObj& obj, CGraph* graph)
+{
 	return false;
 }
 void CModelContainer::transAllModelToGraph()
@@ -75,7 +81,7 @@ void CModelContainer::transAllModelToGraph()
 	ModelVec::iterator it;
 	for (it = _modelVec.begin(); it != _modelVec.end(); it++)
 	{
-		transToGraph(*(*it), _graph);
+		addToGraph(*(*it), _graph);
 	}
 	return;
 }

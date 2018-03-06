@@ -68,15 +68,20 @@ char* CModelRtLoader::assembleObjs(const CBuffer& buf, int record_num, const str
 		TRACE("app_str is %s,obj_type is %s \n ",app_str.c_str(),obj_type.c_str());
 #if 1
 		int j = 0;
-		buf_ptr += i * record_size;
+		//buf_ptr += i * record_size;
+		buf_ptr += record_size;
 		IPropertyInfo::PropertyInfoMapIterator itp;
 		CPropertyInfo* p = NULL;
 		for (itp = pinfo.begin(); itp != pinfo.end(); itp++, j++)
 		{
 			char* fptr = buf_ptr + vec_field_info[j].offset;
-			//printf("buf_ptr = %d , offset is %d \n",buf_ptr,vec_field_info[j].offset);
+			printf("buf_ptr = %d , offset is %d , j=%d\n",buf_ptr,vec_field_info[j].offset,j);
 			p = dynamic_cast<CPropertyInfo*>(itp->second);
-			//printf("property field no is %d , vecfieldinfo field no is %d\n",p->fieldNo(),vec_field_info[j].field_no);
+			printf("property field no is %d , vecfieldinfo field no is %d\n",p->fieldNo(),vec_field_info[j].field_no);
+			if (p->fieldNo() < 0)
+			{
+				continue;
+			}
 			CUDataValue::DATA_TYPE type = p->type();
 			switch (type)
 			{

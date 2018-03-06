@@ -114,6 +114,7 @@ void CPropertyReaderImpl::parseModelProperty(const char* tagName,
 				{
 					field_count++;
 					IPropertyInfo *property = new CPropertyInfo() ;
+
 					(*property)("name",e.attribute("name").toStdString())
 					("type",e.attribute("type").toStdString())
 					("len",e.attribute("len").toStdString())

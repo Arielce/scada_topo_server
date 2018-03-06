@@ -20,8 +20,7 @@ CConfigurationInfo::~CConfigurationInfo()
 {
 	// TODO Auto-generated destructor stub
 }
-IPropertyInfo::PropertyInfoMap& CConfigurationInfo::getProperty(const CModelObj::AppType& apptype,
-		const CModelObj::ObjType& objtype)
+IPropertyInfo::PropertyInfoMap& CConfigurationInfo::getProperty(const CModelObj::AppType& apptype, const CModelObj::ObjType& objtype)
 {
 	IPropertyInfo::PropertyMapIterator it_type;
 	IPropertyInfo::PropertyTypeInfoMapIterator it;
@@ -51,7 +50,7 @@ IPropertyInfo::PropertyMap& CConfigurationInfo::getAllProperty()
 {
 	return _propertyInfo;
 }
-const string CConfigurationInfo::getAttributeValue(IPropertyInfo::PropertyInfoMap& property,const string& attr_name)
+const string CConfigurationInfo::getAttributeValue(IPropertyInfo::PropertyInfoMap& property, const string& attr_name)
 {
 	IPropertyInfo::const_iterator it_attr;
 	IPropertyInfo::PropertyInfoMapIterator it;
@@ -64,5 +63,20 @@ const string CConfigurationInfo::getAttributeValue(IPropertyInfo::PropertyInfoMa
 		}
 	}
 	return string("");
+}
+vector<IPropertyInfo*> CConfigurationInfo::getPropertyInfoByAttrName(IPropertyInfo::PropertyInfoMap& property, const string& attr_name)
+{
+	vector<IPropertyInfo*> vec_ret;
+	IPropertyInfo::const_iterator it_attr;
+	IPropertyInfo::PropertyInfoMapIterator it;
+	for (it = property.begin(); it != property.end(); it++)
+	{
+		it_attr = it->second->find(attr_name);
+		if (it_attr != it->second->end())
+		{
+			vec_ret.push_back(it->second);
+		}
+	}
+	return vec_ret;
 }
 } /* namespace SCADA_ALG */

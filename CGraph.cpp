@@ -79,8 +79,7 @@ CEdge* CVertex::createEdgeTo(const SCA_ND_ID id, const SCA_ID edgeId)
 	{
 		CEdge* edge = new CEdge(this, vertex, edgeId);
 		m_graph->m_vecEdge.push_back(edge);
-		m_graph->m_mapIndexEdge.insert(
-				make_pair(edgeId, (unsigned int) m_graph->m_vecEdge.size() - 1));
+		m_graph->m_mapIndexEdge.insert(make_pair(edgeId, (unsigned int) m_graph->m_vecEdge.size() - 1));
 
 		//this->m_vecEdge.push_back( edge );
 		//m_iDegree++;
@@ -158,8 +157,7 @@ CEdge::CEdge(const SCA_ID id) :
 
 }
 CEdge::CEdge(CVertex* const s_vertex, CVertex* const e_vertex, const SCA_ID id) :
-		m_sVertex(s_vertex), m_eVertex(e_vertex), m_bEdgeOpen(false), m_edgeId(id), m_bEdgeBorder(
-				false)
+		m_sVertex(s_vertex), m_eVertex(e_vertex), m_bEdgeOpen(false), m_edgeId(id), m_bEdgeBorder(false)
 {
 
 }
@@ -230,6 +228,12 @@ void CEdge::freeEdge()
 		m_eVertex->freeVertex();
 		m_eVertex = NULL;
 	}
+	vector<CLabel*>::iterator it;
+	for (it = m_vecLabels.begin(); it != m_vecLabels.end(); it++)
+	{
+		(*it)->delEdge(this);
+	}
+	//delete this;
 	//if ( m_sVertex == NULL && m_eVertex == NULL )
 	//{
 	//    delete this;
@@ -243,6 +247,7 @@ void CEdge::addLabel(CLabel* label)
 		if (it == m_vecLabels.end())
 		{
 			m_vecLabels.push_back(label);
+			label->addEdge(this);
 		}
 	}
 }
@@ -254,6 +259,7 @@ void CEdge::delLabel(CLabel* label)
 		if (it != m_vecLabels.end())
 		{
 			m_vecLabels.erase(it);
+			label->delEdge(this);
 		}
 	}
 }
@@ -362,7 +368,7 @@ void CIsland::appendVertex(CVertex* v)
 }
 void CIsland::appendVertexs(vector<CVertex*>& vec_vertex)
 {
-	//m_vecVertex.insert( m_vecVertex.end(),vec_vertex.begin(),vec_vertex.end() );
+//m_vecVertex.insert( m_vecVertex.end(),vec_vertex.begin(),vec_vertex.end() );
 	vector<CVertex*>::iterator it;
 	for (it = vec_vertex.begin(); it != vec_vertex.end(); it++)
 	{
@@ -388,13 +394,25 @@ int CLabel::getAllEdges(vector<CEdge*>& vec_edges)
 	vec_edges = m_vecEdge;
 	return m_vecEdge.size();
 }
+void CLabel::addEdge(CEdge* e)
+{
+	m_vecEdge.push_back(e);
+}
+void CLabel::delEdge(CEdge* e)
+{
+	vector<CEdge*>::iterator it;
+	it = std::find(m_vecEdge.begin(), m_vecEdge.end(), e);
+	if (it != m_vecEdge.end())
+	{
+		m_vecEdge.erase(it);
+	}
+}
 
 //CGraph
 static int graph_id;
 static int graphs_nifty_counter; // zero initialized at load time
 static char graphMapStorage_buf[sizeof(CGraph::GraphMapStorage)]; // memory for the nifty-counter singleton object
-CGraph::GraphMapStorage &CGraph::_graphMapStorageInstance =
-		reinterpret_cast<CGraph::GraphMapStorage&>(graphMapStorage_buf); // memory for placement new
+CGraph::GraphMapStorage &CGraph::_graphMapStorageInstance = reinterpret_cast<CGraph::GraphMapStorage&>(graphMapStorage_buf); // memory for placement new
 
 CGraph::GraphMapStorage::GraphMapStorage()
 {
@@ -445,7 +463,7 @@ CGraph* CGraph::getGraph(const std::string& name)
 
 void CGraph::_addGraph(CGraph* graph)
 {
-	//REQUIRE(_allAppenders.find(appender->getName()) == _getAllAppenders().end())
+//REQUIRE(_allAppenders.find(appender->getName()) == _getAllAppenders().end())
 	threading::ScopedLock lock(_graphMapStorageInstance._graphMapMutex);
 	_getAllGraphs()[graph->getName()] = graph;
 }
@@ -453,12 +471,12 @@ void CGraph::_addGraph(CGraph* graph)
 void CGraph::_removeGraph(CGraph* appender)
 {
 	threading::ScopedLock lock(_graphMapStorageInstance._graphMapMutex);
-	//private called from destructor only, but may be triggered by client code in several treads
+//private called from destructor only, but may be triggered by client code in several treads
 	_getAllGraphs().erase(appender->getName());
 }
 void CGraph::_deleteAllGraphs()
 {
-	// deleting each appenders will cause a lock on Appender::_appenderMapMutex to be obtained again within destructor. to avoid nested locks:
+// deleting each appenders will cause a lock on Appender::_appenderMapMutex to be obtained again within destructor. to avoid nested locks:
 	std::vector<CGraph*> appenders;
 	{
 		threading::ScopedLock lock(_graphMapStorageInstance._graphMapMutex);
@@ -488,7 +506,7 @@ void CGraph::_deleteAllGraphsWOLock(std::vector<CGraph*> &graphs)
 CGraph::CGraph(const std::string& name) :
 		_name(name), _island_base_no(1000000)
 {
-	// TODO Auto-generated constructor stub
+// TODO Auto-generated constructor stub
 	printf("this is constructor of CGraph\n");
 	_graphId = ++graph_id;
 	_addGraph(this);
@@ -496,8 +514,8 @@ CGraph::CGraph(const std::string& name) :
 
 CGraph::~CGraph()
 {
-	// TODO Auto-generated destructor stub
-	//freeGraph();
+// TODO Auto-generated destructor stub
+//freeGraph();
 	_removeGraph(this);
 }
 
@@ -555,10 +573,7 @@ CEdge* CGraph::findEdgeById(const SCA_ID id)
 }
 CIsland* CGraph::createIsland(const int island_no)
 {
-	CIsland::ISLAND_ID local_island_no =
-			island_no < 0 ?
-					_graphId * _island_base_no + m_vecIsland.size() :
-					_graphId * _island_base_no + island_no;
+	CIsland::ISLAND_ID local_island_no = island_no < 0 ? _graphId * _island_base_no + m_vecIsland.size() : _graphId * _island_base_no + island_no;
 	IterIslandIdx it = m_mapIndexIsland.find(local_island_no);
 	if (it != m_mapIndexIsland.end())
 	{
@@ -595,7 +610,7 @@ void CGraph::mergeGraph(const CGraph* graph)
 }
 void CGraph::freeGraph()
 {
-	//free edge
+//free edge
 	vector<CEdge*>::iterator it_e = m_vecEdge.begin();
 	for (; it_e != m_vecEdge.end(); it_e++)
 	{
@@ -607,7 +622,7 @@ void CGraph::freeGraph()
 		}
 	}
 	m_vecEdge.clear();
-	//free label
+//free label
 	vector<CLabel*>::iterator it_l = m_vecLabel.begin();
 	for (; it_l != m_vecLabel.end(); it_l++)
 	{
@@ -618,7 +633,7 @@ void CGraph::freeGraph()
 			*it_l = NULL;
 		}
 	}
-	//free island
+//free island
 	vector<CIsland*>::iterator it_i = m_vecIsland.begin();
 	for (; it_i != m_vecIsland.end(); it_i++)
 	{
@@ -638,12 +653,12 @@ void CGraph::debugPrintGraph()
 		if (*it_e)
 		{
 			printf("graph edge %ld\n", (*it_e)->getId());
-			printf("		vertex start : %ld\n",(*it_e)->getStartVertex()->getId());
-			printf("		vertex end   : %ld\n",(*it_e)->getStartVertex()->getId());
+			printf("		vertex start : %ld\n", (*it_e)->getStartVertex()->getId());
+			printf("		vertex end   : %ld\n", (*it_e)->getStartVertex()->getId());
 		}
 	}
 	m_vecEdge.clear();
-	//free label
+//free label
 	vector<CLabel*>::iterator it_l = m_vecLabel.begin();
 	for (; it_l != m_vecLabel.end(); it_l++)
 	{
@@ -652,7 +667,7 @@ void CGraph::debugPrintGraph()
 			printf("graph label %s\n", (*it_l)->name().c_str());
 		}
 	}
-	//free island
+//free island
 	vector<CIsland*>::iterator it_i = m_vecIsland.begin();
 	for (; it_i != m_vecIsland.end(); it_i++)
 	{
@@ -750,7 +765,7 @@ void CSubGraph::releaseEdge(const SCA_ID id)
 }
 void CSubGraph::freeGraph()
 {
-	//free island
+//free island
 	vector<CIsland*>::iterator it_i = m_vecIsland.begin();
 	for (; it_i != m_vecIsland.end(); it_i++)
 	{

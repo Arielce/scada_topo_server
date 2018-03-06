@@ -25,9 +25,9 @@ public:
 	virtual ~CModelContainer();
 
 	typedef vector<CModelObj*> ModelVec;
-	//typedef map<string, ModelVec> ModelMap;
 	typedef map<CUDataValue, CModelObj*> ModelIndex;
 	typedef map<CUDataValue, CModelObj*>::iterator ModelIndexIterator;
+	typedef map<CModelObj*,set<CPropertyContainer*> > ModelGraphIndex;
 
 	/*向图中添加模型对象*/
 	virtual void addModelObj(CModelObj& obj);
@@ -48,11 +48,13 @@ public:
 	}
 
 protected:
-	virtual bool transToGraph(CModelObj& obj, CGraph* graph);
+	virtual bool addToGraph(CModelObj& obj, CGraph* graph);
+	virtual bool delFromGraph(CModelObj& obj, CGraph* graph);
 
 protected:
 	ModelVec _modelVec; //原始模型
 	ModelIndex _modelIndex; //模型索引
+	ModelGraphIndex _modelGraphIndex;//模型与图模型对应
 	CGraph* _graph;		//图模型
 	unsigned int _modelNum;		//模型数量
 };
