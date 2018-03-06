@@ -32,4 +32,8 @@ void CModelFileLoader::readModelFile(const string& file_name)
 {
 	return;
 }
+std::auto_ptr<IModelLoader> create_rt_loader()
+{
+	return std::auto_ptr<IModelLoader>(new CModelFileLoader());
+}
 } /* namespace SCADA_ALG */

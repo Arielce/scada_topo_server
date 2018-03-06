@@ -12,6 +12,7 @@ namespace SCADA_ALG
 static CModelLoaderFactory* loader_factory_ = 0;
 
 std::auto_ptr<IModelLoader> create_rt_loader(); //关系模型加载
+std::auto_ptr<IModelLoader> create_file_loader();//文件模型加载
 //std::auto_ptr<IModelLoader> create_gdb_loader(); //图模型加载
 CModelLoaderFactory::CModelLoaderFactory()
 {
@@ -26,6 +27,7 @@ CModelLoaderFactory& CModelLoaderFactory::getInstance()
 		std::auto_ptr<CModelLoaderFactory> af(new CModelLoaderFactory);
 
 		af->registerCreator("rt", &create_rt_loader);
+		af->registerCreator("file",&create_file_loader);
 		//af->registerCreator("gdb", &create_gdb_loader);
 
 		loader_factory_ = af.release();
