@@ -22,14 +22,14 @@ CModelFileLoader::~CModelFileLoader()
 }
 void CModelFileLoader::loadModelTo(CModelContainer& container,const string& app_str)
 {
-
+	return;
 }
 void CModelFileLoader::loadOneModelByKey(CModelContainer& container,const string& app_str,const KEY_TYPE& key)
 {
-
+	return;
 }
 void CModelFileLoader::readModelFile(const string& file_name)
 {
-
+	return;
 }
 } /* namespace SCADA_ALG */
