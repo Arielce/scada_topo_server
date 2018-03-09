@@ -653,8 +653,16 @@ void CGraph::debugPrintGraph()
 		if (*it_e)
 		{
 			printf("graph edge %ld\n", (*it_e)->getId());
-			printf("		vertex start : %ld\n", (*it_e)->getStartVertex()->getId());
-			printf("		vertex end   : %ld\n", (*it_e)->getStartVertex()->getId());
+			printf("		vertex start : %ld   island : %ld\n", (*it_e)->getStartVertex()->getId(),(*it_e)->getStartVertex()->belongToIsland(this)->getId());
+			printf("		vertex end   : %ld   island : %ld\n", (*it_e)->getEndVertex()->getId(),(*it_e)->getEndVertex()->belongToIsland(this)->getId());
+
+			vector<CLabel*>::iterator it;
+			vector<CLabel*> vec_labels;
+			(*it_e)->getLabels(vec_labels);
+			for (it = vec_labels.begin(); it != vec_labels.end();it++)
+			{
+				printf("		label is %s \n",(*it)->name().c_str());
+			}
 		}
 	}
 	m_vecEdge.clear();
@@ -673,7 +681,7 @@ void CGraph::debugPrintGraph()
 	{
 		if (*it_i)
 		{
-			printf("graph island %s\n", (*it_i)->getId());
+			printf("graph island %d\n", (*it_i)->getId());
 		}
 	}
 }

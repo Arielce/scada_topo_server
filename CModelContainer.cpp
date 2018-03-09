@@ -20,7 +20,7 @@ CModelContainer::~CModelContainer()
 	// TODO Auto-generated destructor stub
 	//todo Îö¹¹_modelVec
 	vector<CModelObj*>::iterator it;
-	for ( it = _modelVec.begin(); it != _modelVec.end(); it++ )
+	for (it = _modelVec.begin(); it != _modelVec.end(); it++)
 	{
 		if (*it)
 		{
@@ -34,6 +34,7 @@ void CModelContainer::addModelObj(CModelObj& obj)
 	CModelObj* model_obj = new CModelObj(obj);
 	_modelVec.push_back(model_obj);
 	_modelIndex.insert(make_pair(obj.keyValue(), model_obj));
+	_modelType[model_obj->getObjType()].push_back(model_obj);
 	//addToGraph(obj,_graph);
 }
 void CModelContainer::delModelObj(CModelObj& obj)
@@ -42,11 +43,22 @@ void CModelContainer::delModelObj(CModelObj& obj)
 	it = _modelIndex.find(obj.keyValue());
 	if (it != _modelIndex.end())
 	{
-		int index = it->second;
-		ModelVec::iterator it_vec = _modelVec.begin() + index;
-		_modelVec.erase(it_vec);
-		_modelNum--;
-		_modelIndex.erase(it);
+		CModelObj* p = it->second;
+		assert(p!=NULL);
+		ModelVec::iterator it_vec = std::find(_modelVec.begin(), _modelVec.end(), p);
+		if (it_vec != _modelVec.end())
+		{
+			_modelVec.erase(it_vec);
+			_modelNum--;
+			_modelIndex.erase(it);
+			vector<CModelObj*>& vec_type_model = _modelType[obj.getObjType()];
+			ModelVec::iterator it_type = std::find( vec_type_model.begin(),vec_type_model.end(),p );
+			if (it_type != vec_type_model.end())
+			{
+				vec_type_model.erase(it_type);
+			}
+			delete p;
+		}
 	}
 	//delFromGraph(obj,_graph);
 }
@@ -59,8 +71,7 @@ void CModelContainer::delModelObjProperty(CModelObj& obj, const string property_
 		obj.erase(it);
 	}
 }
-void CModelContainer::addModelObjProperty(CModelObj& obj, const string property_name,
-		CUDataValue& value)
+void CModelContainer::addModelObjProperty(CModelObj& obj, const string property_name, CUDataValue& value)
 {
 	obj[property_name] = value;
 }

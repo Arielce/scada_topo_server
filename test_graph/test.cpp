@@ -226,7 +226,7 @@ int main(int argc, char** argv)
 	graph3->freeGraph();
 	//delete graph3;
 
-	CPropertyReader::loadConfigure("/home/d5000/hs3/conf/topo_model_rtdb.xml");
+	CPropertyReader::loadConfigure("/home/d5000/yanshi/conf/topo_model_rtdb.xml");
 	int ret = CPropertyReader::getAllPropertyInfo(CConfigurationInfo::getInst()->getAllProperty());
 
 	printf("------------------------start---------------------------------\n");
@@ -264,6 +264,21 @@ int main(int argc, char** argv)
 
 	container.transAllModelToGraph();
 
-	//test_graph->debugPrintGraph();
+	CTopoAlg topo_alg_test;
+	topo_alg_test.setConnectedGraphName("test");
+	topo_alg_test.setGraph(test_graph);
+	topo_alg_test.searchConnectedGraph();
+	vector<CVertex*> vecV_test = test_graph->getAllVertex();
+		for (int i = 0; i < vecV_test.size(); i++)
+		{
+			if (vecV_test[i]->hasProperty("test"))
+			{
+				int sub_island_no = vecV_test[i]->getProperty("test").c_int();
+				printf("id = %ld , island is %d \n", vecV_test[i]->getId(), sub_island_no);
+				CIsland* island = test_graph->createIsland(sub_island_no);
+				island->appendVertex(vecV_test[i]);
+			}
+		}
+	test_graph->debugPrintGraph();
 	return 1;
 }

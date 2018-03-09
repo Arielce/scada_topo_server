@@ -38,12 +38,14 @@ void CRtModelContainer::addModelObj(CModelObj& obj)
 		}
 		CPropertyInfo *p = dynamic_cast<CPropertyInfo*>(itp->second); //转换成描述实时库的属性
 		assert(p != NULL);
-		TRACE("name %s, hasParent %d\n", p->name().c_str(), p->hasParent() == true ? 1 : 0);
+		TRACE("name %s, hasParent %d\n", p->name().c_str(), p->hasParent() == true ? 1 : 0)
+;
 		if (p->hasParent()) //如果有父设备
 		{
 			CVertex* v = _relGraph->createVertex(obj.keyValue().c_long());
 			CUDataValue parent_id = obj[p->name()];
-			TRACE("parent_id is %ld\n",parent_id.c_long());
+			TRACE("parent_id is %ld\n",parent_id.c_long())
+;
 			CVertex* pv = _relGraph->createVertex(parent_id.c_long());
 			v->createEdgeTo(pv->getId(), v->getId());
 		}
@@ -95,11 +97,13 @@ bool CRtModelContainer::addToGraph(CModelObj& obj, CGraph* graph)
 			continue;
 		}
 		CPropertyInfo *p = dynamic_cast<CPropertyInfo*>(itp->second); //转换成描述实时库的属性
-		TRACE("p name is %s\n",p->name().c_str());
+		TRACE("p name is %s\n",p->name().c_str())
+;
 		if (p->isLink()) //表示连接点，转成CVertex
 		{
 			long id = obj[p->name()].c_long(); //连接点ID
-			TRACE("link id ===== %ld \n",id);
+			TRACE("link id ===== %ld \n",id)
+;
 			if (!checkLinkValid(id))
 			{
 				continue;
@@ -107,22 +111,28 @@ bool CRtModelContainer::addToGraph(CModelObj& obj, CGraph* graph)
 			if (vcount == 0)
 			{
 				fv = graph->createVertex(id);
-				_modelGraphIndex[&obj].insert(fv);
+				_modelGraphMap[&obj].insert(fv);
 				ret = true;
 			}
 			else
 			{
 				CVertex* v = graph->createVertex(id); //为连接点创建图节点
-				_modelGraphIndex[&obj].insert(v);
+				_modelGraphMap[&obj].insert(v);
 				CEdge* e = fv->createEdgeTo(id, obj_id.c_long()); //创建指向连接点的边，实时库的id必须是long
 				assert(e != NULL);
-				_modelGraphIndex[&obj].insert(e);
+				_modelGraphMap[&obj].insert(e);
 				e->addLabel(graph->createLabel(obj.getObjType())); //将模型对象类型作为边的标签
 				ret = true;
 			}
 			vcount++;
 		}
 
+	}
+	if (fv == NULL)
+	{
+		TRACE("create vertex failed!\n")
+;
+		return false;
 	}
 	for (it = obj.begin(); it != obj.end(); it++)
 	{
@@ -135,6 +145,12 @@ bool CRtModelContainer::addToGraph(CModelObj& obj, CGraph* graph)
 		if (p->hasParent()) //如果有父设备(比如：主网变压器、交流线段)
 		{
 			CUDataValue parent_id = obj[p->name()];
+			ModelIndexIterator it_parent = _modelIndex.find(parent_id);
+			if (it_parent == _modelIndex.end())
+			{
+				printf("未找到父对象%ld\n", parent_id.c_long());
+				continue;
+			}
 			CVertex* v = _relGraph->findVertexById(obj_id.c_long());
 			CVertex* pv = _relGraph->findVertexById(parent_id.c_long());
 			vector<CEdge*> vec_edges = pv->getEdges();
@@ -181,14 +197,14 @@ bool CRtModelContainer::addToGraph(CModelObj& obj, CGraph* graph)
 						continue;
 					}
 					CVertex* opp_v = graph->createVertex(link_id); //创建节点号在图中的点
-					_modelGraphIndex[opp_obj].insert(opp_v);
-					_modelGraphIndex[opp_obj].insert(v);
-					//					long e_id = parent_id.c_long();
-					//					assert(no < 10); //不超过10个子设备
-					//					SET_RECORD_ID(e_id, GET_RECORD_ID(e_id) * 10 + no);
-					CEdge* e = fv->createEdgeTo(link_id, opp_id);					//创建pv和opp_v之间的边，边的id为对端设备id
-					_modelGraphIndex[opp_obj].insert(e);
-					e->addLabel(graph->createLabel(opp_obj->getObjType()));					//将父对象的类型作为边的标签
+					_modelGraphMap[opp_obj].insert(opp_v);
+					//_modelGraphMap[opp_obj].insert(v);
+					//long e_id = parent_id.c_long();
+					//assert(no < 10); //不超过10个子设备
+					//SET_RECORD_ID(e_id, GET_RECORD_ID(e_id) * 10 + no);
+					CEdge* e = fv->createEdgeTo(link_id, opp_id);						//创建pv和opp_v之间的边，边的id为对端设备id
+					_modelGraphMap[it_parent->second].insert(e);						//边都作为父对象对应的图模型，比如线段模型对应两个线端创建的边，变压器模型对应三个绕组创建的三条边
+					e->addLabel(graph->createLabel(it_parent->second->getObjType()));	//将父对象的类型作为边的标签
 					ret = true;
 				}
 			}
@@ -250,7 +266,7 @@ bool CRtModelContainer::delFromGraph(CModelObj& obj, CGraph* graph)
 		if (p->hasProperty("sub"))
 		{
 			set<CPropertyContainer*>::iterator it_set;
-			for (it_set = _modelGraphIndex[&obj].begin(); it_set != _modelGraphIndex[&obj].end(); it_set++)
+			for (it_set = _modelGraphMap[&obj].begin(); it_set != _modelGraphMap[&obj].end(); it_set++)
 			{
 				CEdge* e = dynamic_cast<CEdge*>(*it_set);
 				if (e)
@@ -266,6 +282,10 @@ bool CRtModelContainer::delFromGraph(CModelObj& obj, CGraph* graph)
 }
 bool CRtModelContainer::checkLinkValid(SCA_ND_ID id)
 {
+	if (id == -1)
+	{
+		return false;
+	}
 	return true;
 }
 void CRtModelContainer::debugPrint()

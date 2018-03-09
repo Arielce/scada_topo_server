@@ -18,8 +18,17 @@ class IModelLoader
 {
 public:
 	virtual ~IModelLoader(){}
+	/*向CModelContainer中加载所有app_str应用下的模型*/
 	virtual void loadModelTo(CModelContainer& container,const string& app_str) = 0;
+	/*向CModelContainer中加载app_str应用下关键字为key的模型*/
 	virtual void loadOneModelByKey(CModelContainer& container,const string& app_str,const KEY_TYPE& key) = 0;
+	/*从CModelContainer中删除所有app_str应用下的模型*/
+	virtual void delModelFrom(CModelContainer& container,const string& app_str) = 0;
+	/*从CModelContainer中删除app_str应用下关键字是key的模型*/
+	virtual void delOneModelByKey(CModelContainer& container,const string& app_str,const KEY_TYPE& key) = 0;
+	/**/
+	virtual void refreshCbStatus(CModelContainer& container,const string& app_str) = 0;
+	virtual void refreshCbStatusByKey(CModelContainer& container,const string& app_str,const KEY_TYPE& key) = 0;
 };
 
 } /* namespace SCADA_ALG */

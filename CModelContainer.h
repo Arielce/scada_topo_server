@@ -28,6 +28,7 @@ public:
 	typedef map<CUDataValue, CModelObj*> ModelIndex;
 	typedef map<CUDataValue, CModelObj*>::iterator ModelIndexIterator;
 	typedef map<CModelObj*,set<CPropertyContainer*> > ModelGraphIndex;
+	typedef map<CModelObj::ObjType,vector<CModelObj*> > ModelTypeMap;
 
 	/*向图中添加模型对象*/
 	virtual void addModelObj(CModelObj& obj);
@@ -54,7 +55,8 @@ protected:
 protected:
 	ModelVec _modelVec; //原始模型
 	ModelIndex _modelIndex; //模型索引
-	ModelGraphIndex _modelGraphIndex;//模型与图模型对应
+	ModelTypeMap _modelType;//模型类型-模型
+	ModelGraphIndex _modelGraphMap;//模型与图模型对应
 	CGraph* _graph;		//图模型
 	unsigned int _modelNum;		//模型数量
 };
