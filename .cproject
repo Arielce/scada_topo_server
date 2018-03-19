@@ -32,6 +32,7 @@
 									<listOptionValue builtIn="false" value="/Users/wenlinge/Work/qt-4.8.1/include/QtCore"/>
 									<listOptionValue builtIn="false" value="/Users/wenlinge/Work/qt-4.8.1/include"/>
 									<listOptionValue builtIn="false" value="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.13.sdk/usr/include/c++/4.2.1"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/scada_alg/GraphCore}&quot;"/>
 								</option>
 								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.1224902165" languageId="org.eclipse.cdt.core.g++" languageName="GNU C++" sourceContentType="org.eclipse.cdt.core.cxxSource,org.eclipse.cdt.core.cxxHeader" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
 							</tool>
