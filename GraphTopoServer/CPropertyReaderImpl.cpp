@@ -104,6 +104,7 @@ void CPropertyReaderImpl::parseModelProperty(const char* tagName,
 					(*property)("tab",QString("%1").arg(tab_no).toStdString());
 					m_vecPropertyForCleaner.push_back(property);
 
+					//property->setPropertyType("tab");
 					p_map.insert( make_pair("tab",property) );
 				}
 				else if (e.tagName() == "field_num")
@@ -124,6 +125,7 @@ void CPropertyReaderImpl::parseModelProperty(const char* tagName,
 					("parent",e.attribute("parent").toStdString())
 					("field_no",e.text().toStdString());
 
+					//property->setPropertyType("field");
 					m_vecPropertyForCleaner.push_back(property);
 
 					p_map.insert( make_pair(property->name(),property) );

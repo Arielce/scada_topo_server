@@ -47,14 +47,12 @@ void CModelRtLoader::loadModelTo(CModelContainer& container, const string& app_s
 	}
 
 }
-void CModelRtLoader::loadOneModelByKey(CModelContainer& container, const string& app_str,
-		const KEY_TYPE& key)
+void CModelRtLoader::loadOneModelByKey(CModelContainer& container, const string& app_str, const KEY_TYPE& key)
 {
 
 }
-char* CModelRtLoader::assembleObjs(const CBuffer& buf, int record_num, const string& app_str,
-		const CModelObj::ObjType& obj_type, IPropertyInfo::PropertyInfoMap& pinfo,
-		std::vector<FIELD_BASE_INFO>& vec_field_info, CModelContainer& container)
+char* CModelRtLoader::assembleObjs(const CBuffer& buf, int record_num, const string& app_str, const CModelObj::ObjType& obj_type,
+		IPropertyInfo::PropertyInfoMap& pinfo, std::vector<FIELD_BASE_INFO>& vec_field_info, CModelContainer& container)
 {
 	//assert(record_size == buf.GetLength() / record_num); //todo check
 	int record_size = buf.GetLength() / record_num;
@@ -72,16 +70,19 @@ char* CModelRtLoader::assembleObjs(const CBuffer& buf, int record_num, const str
 		buf_ptr += record_size;
 		IPropertyInfo::PropertyInfoMapIterator itp;
 		CPropertyInfo* p = NULL;
-		for (itp = pinfo.begin(); itp != pinfo.end(); itp++, j++)
+		for (itp = pinfo.begin(); itp != pinfo.end(); itp++,j++)
 		{
 			char* fptr = buf_ptr + vec_field_info[j].offset;
-			printf("buf_ptr = %d , offset is %d , j=%d\n",buf_ptr,vec_field_info[j].offset,j);
+			printf("buf_ptr = %d , offset is %d , j=%d\n", buf_ptr, vec_field_info[j].offset, j);
 			p = dynamic_cast<CPropertyInfo*>(itp->second);
-			printf("property field no is %d , vecfieldinfo field no is %d\n",p->fieldNo(),vec_field_info[j].field_no);
+			printf("property field no is %d , vecfieldinfo field no is %d, property name is %s\n", p->fieldNo(), vec_field_info[j].field_no,
+					p->name().c_str());
 			if (p->fieldNo() < 0)
 			{
+				j--;
 				continue;
 			}
+
 			CUDataValue::DATA_TYPE type = p->type();
 			switch (type)
 			{
@@ -175,14 +176,13 @@ char* CModelRtLoader::assembleObjs(const CBuffer& buf, int record_num, const str
 		}
 	}
 #endif
-		//model_obj.debugPrint();
+	//model_obj.debugPrint();
 		container.addModelObj(model_obj);
 	}
 	return buf_ptr;
 }
 
-void CModelRtLoader::loadModelFromRtdb(CModelContainer& container, const string& app_str,
-		const int& app_no)
+void CModelRtLoader::loadModelFromRtdb(CModelContainer& container, const string& app_str, const int& app_no)
 {
 	IPropertyInfo::PropertyTypeInfoMap& appProperty = CConfigurationInfo::getInst()->getAppProperty(app_str);
 	IPropertyInfo::PropertyTypeInfoMapIterator it;
@@ -205,8 +205,7 @@ void CModelRtLoader::loadModelFromRtdb(CModelContainer& container, const string&
 			}
 			//field_name += p->name();
 			vec_fields.push_back(p->fieldNo());
-			printf("field_name is  %s , field_no  is %d ,len = %d\n", p->name().c_str(),
-					p->fieldNo(), p->len());
+			printf("field_name is  %s , field_no  is %d ,len = %d\n", p->name().c_str(), p->fieldNo(), p->len());
 			//record_size += p->len();
 		}
 		static NET_ODB::CTableNet tab_net;
@@ -220,8 +219,7 @@ void CModelRtLoader::loadModelFromRtdb(CModelContainer& container, const string&
 			printf("field %d\n", vec_fields[i]);
 		}
 		CBuffer buf;
-		int record_num = RTDB_INTERFACE::GetAllRec<NET_ODB::CTableNet>(vec_fields, app_no, tab,
-				buf);
+		int record_num = RTDB_INTERFACE::GetAllRec<NET_ODB::CTableNet>(vec_fields, app_no, tab, buf);
 		if (record_num > 0)
 		{
 			assembleObjs(buf, record_num, app_str, obj_type, pinfo, vec_field_info, container);
@@ -229,14 +227,12 @@ void CModelRtLoader::loadModelFromRtdb(CModelContainer& container, const string&
 	}
 
 }
-void CModelRtLoader::loadModelFromRtdbByKey(CModelContainer& container, const string& app_str,
-		const int& app_no, const KEY_TYPE& key)
+void CModelRtLoader::loadModelFromRtdbByKey(CModelContainer& container, const string& app_str, const int& app_no, const KEY_TYPE& key)
 {
 	int tab_no = GET_TABLE_NO(key);
 	IPropertyInfo::PropertyTypeInfoMap& appProperty = CConfigurationInfo::getInst()->getAppProperty(app_str);
 	IPropertyInfo::PropertyTypeInfoMapIterator it;
-	for (it = appProperty.begin();
-			it != appProperty.end(); it++)
+	for (it = appProperty.begin(); it != appProperty.end(); it++)
 	{
 		CModelObj::ObjType obj_type = it->first;
 		vector<int> vec_fields;
@@ -264,8 +260,7 @@ void CModelRtLoader::loadModelFromRtdbByKey(CModelContainer& container, const st
 			tab_net.GetFieldInfo(vec_fields, vec_field_info);
 			char* buf_ptr = NULL;
 			int buf_size = 0;
-			int record_num = tab_net.TableGetByKey((char*) &key, vec_fields, (char*) &buf_ptr,
-					buf_size);
+			int record_num = tab_net.TableGetByKey((char*) &key, vec_fields, (char*) &buf_ptr, buf_size);
 			buf.SetBuffer(buf_ptr, buf_size);
 
 			if (record_num > 0)
@@ -276,6 +271,22 @@ void CModelRtLoader::loadModelFromRtdbByKey(CModelContainer& container, const st
 		}
 
 	}
+
+}
+void CModelRtLoader::delModelFrom(CModelContainer& container, const string& app_str)
+{
+
+}
+void CModelRtLoader::delOneModelByKey(CModelContainer& container, const string& app_str, const KEY_TYPE& key)
+{
+
+}
+void CModelRtLoader::refreshCbStatus(CModelContainer& container, const string& app_str)
+{
+
+}
+void CModelRtLoader::refreshCbStatusByKey(CModelContainer& container, const string& app_str, const KEY_TYPE& key)
+{
 
 }
 

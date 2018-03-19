@@ -5,8 +5,56 @@
 #include "../CModelContainer.h"
 #include "../CRtModelContainer.h"
 #include "../CConfigurationInfo.h"
-
+#include "../ITopoService.h"
 using namespace SCADA_ALG;
+
+CGraph* g_Graph = NULL;
+
+void* ServiceFunction(char* requestBuffer, int requestlen, char** responseBuffer, int* responselen)
+{
+	int buffer_switch_offset;
+	char lib_name[64];
+	int ret = 0;
+	unsigned char client_endian;
+
+	buffer_switch_offset = 0;
+	memcpy(&client_endian, requestBuffer, sizeof(unsigned char)); //高低字节
+	buffer_switch_offset += sizeof(unsigned char);
+	memcpy(lib_name, requestBuffer + buffer_switch_offset, 64); //动态库名称
+	buffer_switch_offset += 64;
+	if (client_endian != g_endian)
+	{
+		ExchangeStr(lib_name);
+	}
+	//todo getLibrary 线程安全
+	QLibrary* lib = CConfigurationInfo::getInst()->getLibrary(lib_name);
+	if (!lib)
+	{
+		return (void*) 0;
+	}
+	else if (!lib->isLoaded())
+	{
+		return (void*) 0;
+	}
+	typedef void (*MyDllGetTopoServiceFactory)(ITopoServiceFactory**);
+	MyDllGetTopoServiceFactory func_ptr = (MyDllGetTopoServiceFactory) lib->resolve("DllGetTopoServiceFactory");
+
+	ITopoServiceFactory* p_fac = NULL;
+	if (func_ptr)
+	{
+		func_ptr(&p_fac);
+		if (p_fac)
+		{
+			ITopoService* p_topo = NULL;
+			p_fac->CreateTopoService(&p_topo);
+			if (p_topo)
+			{
+				p_topo->setGraph(g_Graph);
+				p_topo->doService(requestBuffer, requestlen,responseBuffer,responselen);
+			}
+		}
+	}
+}
 
 int main(int argc, char** argv)
 {
@@ -280,5 +328,7 @@ int main(int argc, char** argv)
 			}
 		}
 	test_graph->debugPrintGraph();
+
+	g_Graph = test_graph;
 	return 1;
 }

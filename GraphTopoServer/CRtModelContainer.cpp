@@ -148,7 +148,7 @@ bool CRtModelContainer::addToGraph(CModelObj& obj, CGraph* graph)
 			ModelIndexIterator it_parent = _modelIndex.find(parent_id);
 			if (it_parent == _modelIndex.end())
 			{
-				printf("未找到父对象%ld\n", parent_id.c_long());
+				printf("%ld 未找到父对象%ld, field_name is %s\n", obj_id.c_long(),parent_id.c_long(),p->name().c_str());
 				continue;
 			}
 			CVertex* v = _relGraph->findVertexById(obj_id.c_long());

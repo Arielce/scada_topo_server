@@ -32,7 +32,16 @@ public:
 	virtual const string& name() = 0;
 	virtual const bool isKey() = 0;
 	virtual IPropertyInfo& operator()(const string property_name, const string property_value) = 0;
-
+/*
+	void setPropertyType(const string type)
+	{
+		_ptype = type;
+	}
+	string getPropertyType()
+	{
+		return _ptype;
+	}
+*/
 	typedef map<string, string>::const_iterator const_iterator;
 	const_iterator find(const std::string& t) const
 	{
@@ -60,6 +69,7 @@ public:
 	typedef map<string, PropertyTypeInfoMap>::iterator PropertyMapIterator;
 protected:
 	map<string, string> _mapKv;//attribute key-value
+	//string _ptype;//property type
 };
 
 /*关系库属性描述*/

@@ -26,8 +26,9 @@ public:
 	virtual void delModelFrom(CModelContainer& container,const string& app_str) = 0;
 	/*从CModelContainer中删除app_str应用下关键字是key的模型*/
 	virtual void delOneModelByKey(CModelContainer& container,const string& app_str,const KEY_TYPE& key) = 0;
-	/**/
+	/*刷新CModelContainer中有cb*/
 	virtual void refreshCbStatus(CModelContainer& container,const string& app_str) = 0;
+	/**/
 	virtual void refreshCbStatusByKey(CModelContainer& container,const string& app_str,const KEY_TYPE& key) = 0;
 };
 
