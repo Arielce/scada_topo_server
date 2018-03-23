@@ -7,8 +7,9 @@
 
 #ifndef CMODEL_H_
 #define CMODEL_H_
-#include "CUDataValue.h"
-#include "CGraph.h"
+//#include "CUDataValue.h"
+//#include "CGraph.h"
+#include "graphcore_global.h"
 namespace SCADA_ALG
 {
 
@@ -169,7 +170,7 @@ public:
 	/*得到模型的关键字名称*/
 	const string& keyName();
 	/*得到模型的关键字值*/
-	const CUDataValue& keyValue();
+    CUDataValue keyValue() ;
 	/*获取该模型的属性，即属性名称-属性信息，比如在关系模型中即为域名称和域属性*/
 	const IPropertyInfo::PropertyInfoMap& getProperty();
 	void setProperty(IPropertyInfo::PropertyInfoMap& property);
@@ -180,7 +181,7 @@ public:
 	/*赋值操作符*/
 	CModelObj& operator=(const CModelObj& obj);
 	/*比较两个模型是否一致，关键字值一致即认为一致*/
-	bool operator==(CModelObj& obj);
+    bool operator==(CModelObj& obj);
 	/*设置模型类型，比如“breaker”，从模型信息配置文件中得到*/
 	void setObjType(const ObjType type)
 	{

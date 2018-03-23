@@ -1,10 +1,11 @@
-#include "../CGraph.h"
-#include "../CTopoAlg.h"
-#include "../CPropertyReader.h"
-#include "../CModelLoaderFactory.h"
-#include "../CModelContainer.h"
-#include "../CRtModelContainer.h"
-#include "../CConfigurationInfo.h"
+//#include "../CGraph.h"
+//#include "../CTopoAlg.h"
+#include "graphcore_global.h"
+#include "CPropertyReader.h"
+#include "CModelLoaderFactory.h"
+#include "CModelContainer.h"
+#include "CRtModelContainer.h"
+#include "CConfigurationInfo.h"
 
 using namespace SCADA_ALG;
 

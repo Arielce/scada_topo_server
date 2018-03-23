@@ -42,8 +42,8 @@ namespace SCADA_ALG
         ~CUDataValue();
         CUDataValue(const CUDataValue&);
         CUDataValue& operator=(const CUDataValue&);
-        bool operator==(const CUDataValue&);
-        bool operator<(const CUDataValue&);//为了放入map等容器中
+        bool operator==(const CUDataValue&)const;
+        bool operator<(const CUDataValue&)const;//为了放入map等容器中
         short dataType();
         bool isInit();
         void clear();

@@ -18,6 +18,10 @@ public:
 	virtual ~CModelFileLoader();
 	virtual void loadModelTo(CModelContainer& container,const string& app_str);
 	virtual void loadOneModelByKey(CModelContainer& container,const string& app_str,const KEY_TYPE& key);
+    virtual void delModelFrom(CModelContainer& container,const string& app_str);
+    virtual void delOneModelByKey(CModelContainer& container,const string& app_str,const KEY_TYPE& key);
+    virtual void refreshCbStatus(CModelContainer& container,const string& app_str);
+    virtual void refreshCbStatusByKey(CModelContainer& container,const string& app_str,const KEY_TYPE& key);
 
 private:
 	void readModelFile(const string& file_name);

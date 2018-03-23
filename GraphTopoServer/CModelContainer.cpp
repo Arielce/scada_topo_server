@@ -81,8 +81,9 @@ void CModelContainer::updateModelObj(CModelObj& obj)
 	it = _modelIndex.find(obj.keyValue());
 	if (it != _modelIndex.end())
 	{
-		int index = it->second;
-		ModelVec::iterator it_vec = _modelVec.begin() + index;
+        //int index = it->second;
+        CModelObj* p = it->second;
+        ModelVec::iterator it_vec = std::find(_modelVec.begin(), _modelVec.end(), p);
 		*(*it_vec) = obj;
 	}
 }

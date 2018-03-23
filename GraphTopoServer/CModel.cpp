@@ -142,7 +142,7 @@ const string& CModelObj::keyName()
 	return m_keyName;
 
 }
-const CUDataValue& CModelObj::keyValue()
+CUDataValue CModelObj::keyValue()
 {
 	printf("key_name is %s \n", keyName().c_str());
 	const_iterator it = find(keyName());
@@ -172,7 +172,7 @@ CUDataValue CModelObj::operator[](const string pname)
 }
 bool CModelObj::operator==(CModelObj& obj)
 {
-	return this->keyValue() == obj.keyValue();
+    return this->keyValue() == obj.keyValue();
 }
 CModelObj& CModelObj::operator=(const CModelObj& obj)
 {

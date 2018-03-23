@@ -29,14 +29,15 @@ SOURCES += CGraph.cpp \
     CScadaAlg.cpp
 
 HEADERS += CGraph.h\
-        graphcore_global.h \
     CUDataValue.h \
     PThreads.h \
     CTopoAlg.h \
     CScadaAlg.h \
     CCommunityDetectAlg.h
 
+
+unix::QMAKE_POST_LINK += cp ./lib$$TARGET* ../lib;
 unix {
-    target.path = /usr/lib
+    target.path = ../lib
     INSTALLS += target
 }

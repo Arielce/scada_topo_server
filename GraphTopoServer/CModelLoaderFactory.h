@@ -9,7 +9,8 @@
 #define CMODELLOADERFACTORY_H_
 
 #include <stdexcept>
-#include "CGraph.h"
+//#include "CGraph.h"
+#include "graphcore_global.h"
 #include "IModelLoader.h"
 
 namespace SCADA_ALG

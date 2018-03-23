@@ -100,7 +100,7 @@ CUDataValue& CUDataValue::operator=(const CUDataValue& udata)
 		return *this;
 	}
 }
-bool CUDataValue::operator==(const CUDataValue& value)
+bool CUDataValue::operator==(const CUDataValue& value)const
 {
 	if (this->m_init == value.m_init && this->m_type == value.m_type)
 	{
@@ -154,7 +154,7 @@ bool CUDataValue::operator==(const CUDataValue& value)
 	}
 	return false;
 }
-bool CUDataValue::operator<(const CUDataValue& value)
+bool CUDataValue::operator<(const CUDataValue& value)const
 {
 	if (this->m_init == value.m_init && this->m_type == value.m_type)
 	{
