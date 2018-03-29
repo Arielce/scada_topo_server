@@ -8,6 +8,7 @@
 #ifndef CCONFIGURATIONINFO_H_
 #define CCONFIGURATIONINFO_H_
 #include "CModel.h"
+class QLibrary;
 namespace SCADA_ALG
 {
 /*
@@ -28,6 +29,16 @@ namespace SCADA_ALG
  	 </breaker>
  </ems>
  * */
+struct TServicePara
+{
+    string lib_name;
+    unsigned char srvid;
+    QLibrary* lib_ptr;
+    TServicePara():lib_ptr(NULL)
+    {
+
+    }
+};
 class CConfigurationInfo
 {
 public:
@@ -49,6 +60,10 @@ public:
 	const string getAttributeValue(IPropertyInfo::PropertyInfoMap& property, const string& attr_name);
 	/*根据输入的对象属性信息property以及属性信息中的属性名称得到属性指针*/
 	vector<IPropertyInfo*> getPropertyInfoByAttrName(IPropertyInfo::PropertyInfoMap& property, const string& attr_name);
+    /*读取加载动态库的配置信息*/
+    void loadDynamicLibPara(vector<TServicePara>& vec_lib_para);
+private:
+    void parseFuncNo(char* buf,vector<int>& vec_out);
 private:
 	CConfigurationInfo();
 	IPropertyInfo::PropertyMap _propertyInfo;

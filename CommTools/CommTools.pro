@@ -3,12 +3,10 @@
 # Project created by QtCreator 2018-03-19T23:24:40
 #
 #-------------------------------------------------
-!include(../make.conf){
-         error(the file ../make.conf is not exist!!)
-}
+
 QT       -= gui
 
-TARGET = GraphCore
+TARGET = CommonTools
 TEMPLATE = lib
 
 DEFINES += GRAPHCORE_LIBRARY
@@ -24,18 +22,9 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-SOURCES += CGraph.cpp \
-    CUDataValue.cpp \
-    CTopoAlg.cpp \
-    CCommunityDetectAlg.cpp \
-    CScadaAlg.cpp
+SOURCES += CommTools.cpp
 
-HEADERS += CGraph.h\
-    CUDataValue.h \
-    PThreads.h \
-    CTopoAlg.h \
-    CScadaAlg.h \
-    CCommunityDetectAlg.h
+HEADERS += CommTools.h
 
 
 unix::QMAKE_POST_LINK += cp ./lib$$TARGET* ../lib;

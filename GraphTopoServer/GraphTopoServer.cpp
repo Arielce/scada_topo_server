@@ -7,8 +7,15 @@
 #include "CRtModelContainer.h"
 #include "CConfigurationInfo.h"
 
+#include <QLibrary>
+#include <QString>
+#include "ITopoService.h"
+#include "CDyLibLoader.h"
+#include "ServiceBus.h"
+#include "ServiceBusFunc.h"
 using namespace SCADA_ALG;
 
+map<unsigned char, ITopoService*> g_mapFuncServ;
 int main(int argc, char** argv)
 {
 	CGraph* graph = new CGraph("graph");
@@ -115,43 +122,34 @@ int main(int argc, char** argv)
 	printf("before merge island \n");
 
 	printf("======graph1=====\n");
-	printf("va island addr is %x , id = %d\n", va->belongToIsland(graph1),
-			va->belongToIsland(graph1)->getId());
+	printf("va island addr is %x , id = %d\n", va->belongToIsland(graph1), va->belongToIsland(graph1)->getId());
 	//printf("vb island addr is %x , id = %d\n",vb->belongToIsland(graph1),vb->belongToIsland(graph1)->getId());
-	printf("vc island addr is %x , id = %d\n", vc->belongToIsland(graph1),
-			vc->belongToIsland(graph1)->getId());
-	printf("vd island addr is %x , id = %d\n", vd->belongToIsland(graph1),
-			vd->belongToIsland(graph1)->getId());
+	printf("vc island addr is %x , id = %d\n", vc->belongToIsland(graph1), vc->belongToIsland(graph1)->getId());
+	printf("vd island addr is %x , id = %d\n", vd->belongToIsland(graph1), vd->belongToIsland(graph1)->getId());
 	//printf("ve island addr is %x , id = %d\n",ve->belongToIsland(graph1),ve->belongToIsland(graph1)->getId());
 	//printf("vf island addr is %x , id = %d\n",vf->belongToIsland(graph1),vf->belongToIsland(graph1)->getId());
 	//printf("vg island addr is %x , id = %d\n",vg->belongToIsland(graph1),vg->belongToIsland(graph1)->getId());
 	//printf("vh island addr is %x , id = %d\n",vh->belongToIsland(graph1),vh->belongToIsland(graph1)->getId());
 
 	printf("======graph2=====\n");
-	printf("va island addr is %x , id = %d\n", va->belongToIsland(graph2),
-			va->belongToIsland(graph2)->getId());
-	printf("vb island addr is %x , id = %d\n", vb->belongToIsland(graph2),
-			vb->belongToIsland(graph2)->getId());
+	printf("va island addr is %x , id = %d\n", va->belongToIsland(graph2), va->belongToIsland(graph2)->getId());
+	printf("vb island addr is %x , id = %d\n", vb->belongToIsland(graph2), vb->belongToIsland(graph2)->getId());
 	//printf("vc island addr is %x , id = %d\n",vc->belongToIsland(graph2),vc->belongToIsland(graph2)->getId());
 	//printf("vd island addr is %x , id = %d\n",vd->belongToIsland(graph2),vd->belongToIsland(graph2)->getId());
-	printf("ve island addr is %x , id = %d\n", ve->belongToIsland(graph2),
-			ve->belongToIsland(graph2)->getId());
-	printf("vf island addr is %x , id = %d\n", vf->belongToIsland(graph2),
-			vf->belongToIsland(graph2)->getId());
+	printf("ve island addr is %x , id = %d\n", ve->belongToIsland(graph2), ve->belongToIsland(graph2)->getId());
+	printf("vf island addr is %x , id = %d\n", vf->belongToIsland(graph2), vf->belongToIsland(graph2)->getId());
 	//printf("vg island addr is %x , id = %d\n",vg->belongToIsland(graph2),vg->belongToIsland(graph2)->getId());
 	//printf("vh island addr is %x , id = %d\n",vh->belongToIsland(graph2),vh->belongToIsland(graph2)->getId());
 
 	printf("======graph3=====\n");
 	//printf("va island addr is %x , id = %d\n",va->belongToIsland(graph3),va->belongToIsland(graph3)->getId());
-	printf("vb island addr is %x , id = %d\n", vb->belongToIsland(graph3),
-			vb->belongToIsland(graph3)->getId());
+	printf("vb island addr is %x , id = %d\n", vb->belongToIsland(graph3), vb->belongToIsland(graph3)->getId());
 	//printf("vc island addr is %x , id = %d\n",vc->belongToIsland(graph3),vc->belongToIsland(graph3)->getId());
 	//printf("vd island addr is %x , id = %d\n",vd->belongToIsland(graph3),vd->belongToIsland(graph3)->getId());
 	//printf("ve island addr is %x , id = %d\n",ve->belongToIsland(graph3),ve->belongToIsland(graph3)->getId());
 	//printf("vf island addr is %x , id = %d\n",vf->belongToIsland(graph3),vf->belongToIsland(graph3)->getId());
 	//printf("vg island addr is %x , id = %d\n",vg->belongToIsland(graph3),vg->belongToIsland(graph3)->getId());
-	printf("vh island addr is %x , id = %d\n", vh->belongToIsland(graph3),
-			vh->belongToIsland(graph3)->getId());
+	printf("vh island addr is %x , id = %d\n", vh->belongToIsland(graph3), vh->belongToIsland(graph3)->getId());
 
 	printf("start merge\n");
 
@@ -160,62 +158,44 @@ int main(int argc, char** argv)
 	vb->belongToIsland(graph2)->mergeIsland(vb->belongToIsland(graph3), graph);
 
 	printf("======graph=====\n");
-	printf("va island addr is %x , id = %d\n", va->belongToIsland(graph),
-			va->belongToIsland(graph)->getId());
-	printf("vb island addr is %x , id = %d\n", vb->belongToIsland(graph),
-			vb->belongToIsland(graph)->getId());
-	printf("vc island addr is %x , id = %d\n", vc->belongToIsland(graph),
-			vc->belongToIsland(graph)->getId());
-	printf("vd island addr is %x , id = %d\n", vd->belongToIsland(graph),
-			vd->belongToIsland(graph)->getId());
-	printf("ve island addr is %x , id = %d\n", ve->belongToIsland(graph),
-			ve->belongToIsland(graph)->getId());
-	printf("vf island addr is %x , id = %d\n", vf->belongToIsland(graph),
-			vf->belongToIsland(graph)->getId());
-	printf("vg island addr is %x , id = %d\n", vg->belongToIsland(graph),
-			vg->belongToIsland(graph)->getId());
-	printf("vh island addr is %x , id = %d\n", vh->belongToIsland(graph),
-			vh->belongToIsland(graph)->getId());
+	printf("va island addr is %x , id = %d\n", va->belongToIsland(graph), va->belongToIsland(graph)->getId());
+	printf("vb island addr is %x , id = %d\n", vb->belongToIsland(graph), vb->belongToIsland(graph)->getId());
+	printf("vc island addr is %x , id = %d\n", vc->belongToIsland(graph), vc->belongToIsland(graph)->getId());
+	printf("vd island addr is %x , id = %d\n", vd->belongToIsland(graph), vd->belongToIsland(graph)->getId());
+	printf("ve island addr is %x , id = %d\n", ve->belongToIsland(graph), ve->belongToIsland(graph)->getId());
+	printf("vf island addr is %x , id = %d\n", vf->belongToIsland(graph), vf->belongToIsland(graph)->getId());
+	printf("vg island addr is %x , id = %d\n", vg->belongToIsland(graph), vg->belongToIsland(graph)->getId());
+	printf("vh island addr is %x , id = %d\n", vh->belongToIsland(graph), vh->belongToIsland(graph)->getId());
 
 	printf("======graph1=====\n");
-	printf("va island addr is %x , id = %d\n", va->belongToIsland(graph1),
-			va->belongToIsland(graph1)->getId());
+	printf("va island addr is %x , id = %d\n", va->belongToIsland(graph1), va->belongToIsland(graph1)->getId());
 	//printf("vb island addr is %x , id = %d\n",vb->belongToIsland(graph1),vb->belongToIsland(graph1)->getId());
-	printf("vc island addr is %x , id = %d\n", vc->belongToIsland(graph1),
-			vc->belongToIsland(graph1)->getId());
-	printf("vd island addr is %x , id = %d\n", vd->belongToIsland(graph1),
-			vd->belongToIsland(graph1)->getId());
+	printf("vc island addr is %x , id = %d\n", vc->belongToIsland(graph1), vc->belongToIsland(graph1)->getId());
+	printf("vd island addr is %x , id = %d\n", vd->belongToIsland(graph1), vd->belongToIsland(graph1)->getId());
 	//printf("ve island addr is %x , id = %d\n",ve->belongToIsland(graph1),ve->belongToIsland(graph1)->getId());
 	//printf("vf island addr is %x , id = %d\n",vf->belongToIsland(graph1),vf->belongToIsland(graph1)->getId());
 	//printf("vg island addr is %x , id = %d\n",vg->belongToIsland(graph1),vg->belongToIsland(graph1)->getId());
 	//printf("vh island addr is %x , id = %d\n",vh->belongToIsland(graph1),vh->belongToIsland(graph1)->getId());
 
 	printf("======graph2=====\n");
-	printf("va island addr is %x , id = %d\n", va->belongToIsland(graph2),
-			va->belongToIsland(graph2)->getId());
-	printf("vb island addr is %x , id = %d\n", vb->belongToIsland(graph2),
-			vb->belongToIsland(graph2)->getId());
+	printf("va island addr is %x , id = %d\n", va->belongToIsland(graph2), va->belongToIsland(graph2)->getId());
+	printf("vb island addr is %x , id = %d\n", vb->belongToIsland(graph2), vb->belongToIsland(graph2)->getId());
 	//printf("vc island addr is %x , id = %d\n",vc->belongToIsland(graph2),vc->belongToIsland(graph2)->getId());
 	//printf("vd island addr is %x , id = %d\n",vd->belongToIsland(graph2),vd->belongToIsland(graph2)->getId());
-	printf("ve island addr is %x , id = %d\n", ve->belongToIsland(graph2),
-			ve->belongToIsland(graph2)->getId());
-	printf("vf island addr is %x , id = %d\n", vf->belongToIsland(graph2),
-			vf->belongToIsland(graph2)->getId());
+	printf("ve island addr is %x , id = %d\n", ve->belongToIsland(graph2), ve->belongToIsland(graph2)->getId());
+	printf("vf island addr is %x , id = %d\n", vf->belongToIsland(graph2), vf->belongToIsland(graph2)->getId());
 	//printf("vg island addr is %x , id = %d\n",vg->belongToIsland(graph2),vg->belongToIsland(graph2)->getId());
 	//printf("vh island addr is %x , id = %d\n",vh->belongToIsland(graph2),vh->belongToIsland(graph2)->getId());
 
 	printf("======graph3=====\n");
 	//printf("va island addr is %x , id = %d\n",va->belongToIsland(graph3),va->belongToIsland(graph3)->getId());
-	printf("vb island addr is %x , id = %d\n", vb->belongToIsland(graph3),
-			vb->belongToIsland(graph3)->getId());
+	printf("vb island addr is %x , id = %d\n", vb->belongToIsland(graph3), vb->belongToIsland(graph3)->getId());
 	//printf("vc island addr is %x , id = %d\n",vc->belongToIsland(graph3),vc->belongToIsland(graph3)->getId());
 	//printf("vd island addr is %x , id = %d\n",vd->belongToIsland(graph3),vd->belongToIsland(graph3)->getId());
 	//printf("ve island addr is %x , id = %d\n",ve->belongToIsland(graph3),ve->belongToIsland(graph3)->getId());
 	//printf("vf island addr is %x , id = %d\n",vf->belongToIsland(graph3),vf->belongToIsland(graph3)->getId());
-	printf("vg island addr is %x , id = %d\n", vg->belongToIsland(graph3),
-			vg->belongToIsland(graph3)->getId());
-	printf("vh island addr is %x , id = %d\n", vh->belongToIsland(graph3),
-			vh->belongToIsland(graph3)->getId());
+	printf("vg island addr is %x , id = %d\n", vg->belongToIsland(graph3), vg->belongToIsland(graph3)->getId());
+	printf("vh island addr is %x , id = %d\n", vh->belongToIsland(graph3), vh->belongToIsland(graph3)->getId());
 
 	//É¾³ýÍ¼
 	graph->freeGraph();
@@ -233,8 +213,7 @@ int main(int argc, char** argv)
 	printf("------------------------start---------------------------------\n");
 	IPropertyInfo::PropertyTypeInfoMapIterator it;
 	IPropertyInfo::PropertyTypeInfoMap& appProperty = CConfigurationInfo::getInst()->getAppProperty("ems");
-	for (it = appProperty.begin();
-			it != appProperty.end(); it++)
+	for (it = appProperty.begin(); it != appProperty.end(); it++)
 	{
 		CModelObj::ObjType obj_type = it->first;
 		vector<int> vec_fields;
@@ -249,8 +228,8 @@ int main(int argc, char** argv)
 			p = dynamic_cast<CPropertyInfo*>(itp->second);
 			//field_name += p->name();
 			vec_fields.push_back(p->fieldNo());
-			printf("field_name is  %s , field_no  is %d ,len is %d, link is %d\n",
-					p->name().c_str(), p->fieldNo(), p->len(), p->isLink() == true ? 1 : 0);
+			printf("field_name is  %s , field_no  is %d ,len is %d, link is %d\n", p->name().c_str(), p->fieldNo(), p->len(),
+					p->isLink() == true ? 1 : 0);
 			record_size += p->len();
 		}
 
@@ -265,6 +244,47 @@ int main(int argc, char** argv)
 
 	container.transAllModelToGraph();
 
+	test_graph->debugPrintGraph();
+
 	//test_graph->debugPrintGraph();
+
+	vector<TServicePara> vec_lib_para;
+	vector<TServicePara>::iterator it_vec_lib;
+	CConfigurationInfo::getInst()->loadDynamicLibPara(vec_lib_para);
+	CDyLibLoader lib_loader;
+	lib_loader.loadDynamicLoad(vec_lib_para);
+
+	typedef void (*MyDllGetTopoServiceFactory)(ITopoServiceFactory**);
+	for (it_vec_lib = vec_lib_para.begin(); it_vec_lib != vec_lib_para.end(); it_vec_lib++)
+	{
+		ITopoServiceFactory* fac_ptr = NULL;
+		ITopoService* serv_ptr = NULL;
+		MyDllGetTopoServiceFactory func_ptr = (MyDllGetTopoServiceFactory) it_vec_lib->lib_ptr->resolve("DllGetTopoServiceFactory");
+		if (func_ptr)
+		{
+			func_ptr(&fac_ptr);
+			if (fac_ptr)
+			{
+				fac_ptr->CreateTopoService(&serv_ptr);
+				fac_ptr->Release();
+			}
+		}
+		if (serv_ptr)
+		{
+			serv_ptr->setGraph(test_graph);
+			g_mapFuncServ.insert(make_pair(it_vec_lib->srvid, serv_ptr));
+		}
+	}
+
+	CreateSrvBusServer(17779, ServiceBusFunc);
+
+
+	while(1)
+	{
+
+		usleep(100*1000);
+	}
+
 	return 1;
 }
+

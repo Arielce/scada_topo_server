@@ -33,16 +33,7 @@ public:
 	virtual const string& name() = 0;
 	virtual const bool isKey() = 0;
 	virtual IPropertyInfo& operator()(const string property_name, const string property_value) = 0;
-/*
-	void setPropertyType(const string type)
-	{
-		_ptype = type;
-	}
-	string getPropertyType()
-	{
-		return _ptype;
-	}
-*/
+
 	typedef map<string, string>::const_iterator const_iterator;
 	const_iterator find(const std::string& t) const
 	{
@@ -56,7 +47,7 @@ public:
 	{
 		return _mapKv.end();
 	}
-	bool hasProperty(const std::string& t)const
+	bool hasProperty(const std::string& t) const
 	{
 		return (find(t) != end());
 	}
@@ -69,7 +60,7 @@ public:
 	typedef map<string, PropertyInfoMap>::iterator PropertyTypeInfoMapIterator;
 	typedef map<string, PropertyTypeInfoMap>::iterator PropertyMapIterator;
 protected:
-	map<string, string> _mapKv;//attribute key-value
+	map<string, string> _mapKv;  //attribute key-value
 	//string _ptype;//property type
 };
 
@@ -170,7 +161,7 @@ public:
 	/*得到模型的关键字名称*/
 	const string& keyName();
 	/*得到模型的关键字值*/
-    CUDataValue keyValue() ;
+	CUDataValue keyValue();
 	/*获取该模型的属性，即属性名称-属性信息，比如在关系模型中即为域名称和域属性*/
 	const IPropertyInfo::PropertyInfoMap& getProperty();
 	void setProperty(IPropertyInfo::PropertyInfoMap& property);
@@ -181,7 +172,7 @@ public:
 	/*赋值操作符*/
 	CModelObj& operator=(const CModelObj& obj);
 	/*比较两个模型是否一致，关键字值一致即认为一致*/
-    bool operator==(CModelObj& obj);
+	bool operator==(CModelObj& obj);
 	/*设置模型类型，比如“breaker”，从模型信息配置文件中得到*/
 	void setObjType(const ObjType type)
 	{

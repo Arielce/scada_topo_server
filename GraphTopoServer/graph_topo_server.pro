@@ -13,17 +13,23 @@ TEMPLATE = app
 DEFINES += D5000
 contains(DEFINES,D5000)
 {
+    unix{
+            QTDIR = $$system(printenv QTDIR)
+            CURRENT_PROJECT_PATH = $$system(pwd)
+    }
     QTDIR = $$system(printenv QTDIR)
     !include($$QTDIR/lib/qmake.conf){
              error(the file $$QTDIR/lib/qmake.conf is not exist!!)
     }
 
     LIBS += -L$$LIB_DIR      \
-        -lodb_apiall_lib
+        -lodb_apiall_lib \
+        -lparamanage
 }
 
 
-INCLUDEPATH += ../include
+INCLUDEPATH += ../include \
+            ../interface
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked as deprecated (the exact warnings
@@ -47,7 +53,10 @@ SOURCES += CConfigurationInfo.cpp \
     CPropertyReader.cpp \
     CPropertyReaderImpl.cpp \
     CRtModelContainer.cpp \
-    GraphTopoServer.cpp
+    GraphTopoServer.cpp \
+    ServiceBusFunc.cpp \
+    ServiceBus.cpp \
+    CDyLibLoader.cpp
 
 HEADERS += CConfigurationInfo.h\
         CGraphManager.h \
@@ -61,7 +70,10 @@ HEADERS += CConfigurationInfo.h\
     CPropertyReaderImpl.h \
     CRtModelContainer.h \
     GetAllRecFromRealdb.h \
-    IModelLoader.h
+    IModelLoader.h \
+    ServiceBusFunc.h \
+    ServiceBus.h \
+    CDyLibLoader.h
 
 LIBS += -L../lib\
         -lGraphCore
