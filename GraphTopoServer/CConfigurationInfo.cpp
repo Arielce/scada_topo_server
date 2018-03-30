@@ -27,8 +27,8 @@ CConfigurationInfo::~CConfigurationInfo()
 }
 IPropertyInfo::PropertyInfoMap& CConfigurationInfo::getProperty(const CModelObj::AppType& apptype, const CModelObj::ObjType& objtype)
 {
-	IPropertyInfo::PropertyMapIterator it_type;
-	IPropertyInfo::PropertyTypeInfoMapIterator it;
+	IPropertyInfo::AppPropertyInfoMapIterator it_type;
+	IPropertyInfo::ObjPropertyInfoMapIterator it;
 	it_type = _propertyInfo.find(apptype);
 	if (it_type != _propertyInfo.end())
 	{
@@ -40,9 +40,9 @@ IPropertyInfo::PropertyInfoMap& CConfigurationInfo::getProperty(const CModelObj:
 	}
 	return _propertyInfo[""][""];
 }
-IPropertyInfo::PropertyTypeInfoMap& CConfigurationInfo::getAppProperty(const CModelObj::AppType& apptype)
+IPropertyInfo::ObjPropertyInfoMap& CConfigurationInfo::getObjPropertyByApp(const CModelObj::AppType& apptype)
 {
-	IPropertyInfo::PropertyMapIterator it_type;
+	IPropertyInfo::AppPropertyInfoMapIterator it_type;
 
 	it_type = _propertyInfo.find(apptype);
 	if (it_type != _propertyInfo.end())
@@ -51,7 +51,7 @@ IPropertyInfo::PropertyTypeInfoMap& CConfigurationInfo::getAppProperty(const CMo
 	}
 	return _propertyInfo[""];
 }
-IPropertyInfo::PropertyMap& CConfigurationInfo::getAllProperty()
+IPropertyInfo::AppPropertyInfoMap& CConfigurationInfo::getAllProperty()
 {
 	return _propertyInfo;
 }

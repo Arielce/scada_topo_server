@@ -3,7 +3,7 @@
 CDmsTopoImpl::CDmsTopoImpl(CGraph* g)
 	:m_graph(g)
 {
-
+	printf("gewenlin debug graph addres is %x\n",m_graph);
 }
 int CDmsTopoImpl::getConnectedDev(const TRequestDmsTopo& in_para,TRespondDmsTopo& out_para)
 {

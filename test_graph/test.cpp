@@ -278,8 +278,8 @@ int main(int argc, char** argv)
 	int ret = CPropertyReader::getAllPropertyInfo(CConfigurationInfo::getInst()->getAllProperty());
 
 	printf("------------------------start---------------------------------\n");
-	IPropertyInfo::PropertyTypeInfoMapIterator it;
-	IPropertyInfo::PropertyTypeInfoMap& appProperty = CConfigurationInfo::getInst()->getAppProperty("ems");
+	IPropertyInfo::ObjPropertyInfoMapIterator it;
+	IPropertyInfo::ObjPropertyInfoMap& appProperty = CConfigurationInfo::getInst()->getObjPropertyByApp("ems");
 	for (it = appProperty.begin();
 			it != appProperty.end(); it++)
 	{

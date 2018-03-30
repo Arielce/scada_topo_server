@@ -19,8 +19,8 @@ public:
 
 	static void loadConfigure(const string& fileName);
 	static int getServiceInfo(const string& cmdStr,IPropertyInfo& service_info);
-	static int getPropertyInfo(const string& modelCatagory,CPropertyInfo::PropertyTypeInfoMap& property_info);
-	static int getAllPropertyInfo(CPropertyInfo::PropertyMap& propertys);
+	static int getPropertyInfo(const string& modelCatagory,CPropertyInfo::ObjPropertyInfoMap& property_info);
+	static int getAllPropertyInfo(CPropertyInfo::AppPropertyInfoMap& propertys);
 	static int getAllServiceInfo(CPropertyInfo::PropertyInfoMap& vecCmdStr);
 private:
 	static CPropertyReaderImpl *_impl;

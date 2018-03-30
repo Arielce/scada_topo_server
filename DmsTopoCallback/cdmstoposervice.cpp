@@ -13,7 +13,7 @@ const unsigned char g_endian = 0;
 
 CDmsTopoService::CDmsTopoService()
 {
-	m_Impl = new CDmsTopoImpl(m_graph);
+
 }
 
 CDmsTopoService::~CDmsTopoService()
@@ -22,6 +22,13 @@ CDmsTopoService::~CDmsTopoService()
 	{
 		delete m_Impl;
 	}
+}
+
+void CDmsTopoService::setGraph(SCADA_ALG::CGraph* g)
+{
+	m_graph = g;
+	printf("call CDmsTopoService::setGraph...\n");
+	m_Impl = new CDmsTopoImpl(m_graph);
 }
 
 void CDmsTopoService::doService(char* requestBuffer, int requestlen, char** responseBuffer, int* responselen)

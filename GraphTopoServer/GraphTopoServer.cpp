@@ -211,13 +211,13 @@ int main(int argc, char** argv)
 	int ret = CPropertyReader::getAllPropertyInfo(CConfigurationInfo::getInst()->getAllProperty());
 
 	printf("------------------------start---------------------------------\n");
-	IPropertyInfo::PropertyTypeInfoMapIterator it;
-	IPropertyInfo::PropertyTypeInfoMap& appProperty = CConfigurationInfo::getInst()->getAppProperty("ems");
+	IPropertyInfo::ObjPropertyInfoMapIterator it;
+	IPropertyInfo::ObjPropertyInfoMap& appProperty = CConfigurationInfo::getInst()->getObjPropertyByApp("ems");
 	for (it = appProperty.begin(); it != appProperty.end(); it++)
 	{
 		CModelObj::ObjType obj_type = it->first;
 		vector<int> vec_fields;
-		CPropertyInfo* p = dynamic_cast<CPropertyInfo*>(it->second["tab"]);
+		CPropertyInfo* p = dynamic_cast<CPropertyInfo*>(it->second["tab_no"]);
 		int tab = p->tabNo();
 		printf("tab_no is %d \n", tab);
 		IPropertyInfo::PropertyInfoMap pinfo = it->second;
@@ -244,6 +244,23 @@ int main(int argc, char** argv)
 
 	container.transAllModelToGraph();
 
+	CTopoAlg topo_alg4;
+	topo_alg4.setConnectedGraphName("test");
+	topo_alg4.setGraph(test_graph);
+	topo_alg4.searchConnectedGraph();
+
+	vector<CVertex*> vecV4 = test_graph->getAllVertex();
+	for (int i = 0; i < vecV4.size(); i++)
+	{
+		if (vecV4[i]->hasProperty("test"))
+		{
+			int sub_island_no = vecV4[i]->getProperty("test").c_int();
+			//printf("id = %ld , island is %d \n", vecV3[i]->getId(), sub_island_no);
+			CIsland* island = test_graph->createIsland(sub_island_no);
+			island->appendVertex(vecV4[i]);
+		}
+	}
+
 	test_graph->debugPrintGraph();
 
 	//test_graph->debugPrintGraph();
@@ -269,20 +286,28 @@ int main(int argc, char** argv)
 				fac_ptr->Release();
 			}
 		}
+		else
+		{
+			printf("failed to get func_ptr\n");
+		}
 		if (serv_ptr)
 		{
 			serv_ptr->setGraph(test_graph);
+			printf("1111 gewenlin debug graph addres is %x\n",test_graph);
 			g_mapFuncServ.insert(make_pair(it_vec_lib->srvid, serv_ptr));
+		}
+		else
+		{
+			printf("Error:failed to get server\n");
 		}
 	}
 
 	CreateSrvBusServer(17779, ServiceBusFunc);
 
-
-	while(1)
+	while (1)
 	{
 
-		usleep(100*1000);
+		usleep(100 * 1000);
 	}
 
 	return 1;

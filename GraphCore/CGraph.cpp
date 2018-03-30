@@ -647,21 +647,47 @@ void CGraph::freeGraph()
 
 void CGraph::debugPrintGraph()
 {
+	printf("Graph name is %s \n", this->_name.c_str());
 	vector<CEdge*>::iterator it_e = m_vecEdge.begin();
 	for (; it_e != m_vecEdge.end(); it_e++)
 	{
 		if (*it_e)
 		{
 			printf("graph edge %ld\n", (*it_e)->getId());
-			printf("		vertex start : %ld   island : %ld\n", (*it_e)->getStartVertex()->getId(),(*it_e)->getStartVertex()->belongToIsland(this)->getId());
-			printf("		vertex end   : %ld   island : %ld\n", (*it_e)->getEndVertex()->getId(),(*it_e)->getEndVertex()->belongToIsland(this)->getId());
+			CVertex* sv = (*it_e)->getStartVertex();
+			if (sv)
+			{
+				printf("		vertex start : %ld  ", sv->getId());
+				if (sv->belongToIsland(this))
+				{
+					printf("		island : %ld\n", sv->belongToIsland(this)->getId());
+				}
+				else
+				{
+					printf("no island in this graph\n");
+				}
+			}
+			CVertex* ev = (*it_e)->getEndVertex();
+			if (ev)
+			{
+				printf("		vertex end   : %ld   ", ev->getId());
+				//printf("		island : %ld\n",(*it_e)->getEndVertex()->belongToIsland(this)->getId());
+				if (ev->belongToIsland(this))
+				{
+					printf("		island : %ld\n", ev->belongToIsland(this)->getId());
+				}
+				else
+				{
+					printf("no island in this graph\n");
+				}
+			}
 
 			vector<CLabel*>::iterator it;
 			vector<CLabel*> vec_labels;
 			(*it_e)->getLabels(vec_labels);
-			for (it = vec_labels.begin(); it != vec_labels.end();it++)
+			for (it = vec_labels.begin(); it != vec_labels.end(); it++)
 			{
-				printf("		label is %s \n",(*it)->name().c_str());
+				printf("		label is %s \n", (*it)->name().c_str());
 			}
 		}
 	}

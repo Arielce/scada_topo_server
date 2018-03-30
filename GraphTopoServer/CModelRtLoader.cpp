@@ -70,7 +70,7 @@ char* CModelRtLoader::assembleObjs(const CBuffer& buf, int record_num, const str
 		buf_ptr += record_size;
 		IPropertyInfo::PropertyInfoMapIterator itp;
 		CPropertyInfo* p = NULL;
-		for (itp = pinfo.begin(); itp != pinfo.end(); itp++,j++)
+		for (itp = pinfo.begin(); itp != pinfo.end(); itp++, j++)
 		{
 			char* fptr = buf_ptr + vec_field_info[j].offset;
 			printf("buf_ptr = %d , offset is %d , j=%d\n", buf_ptr, vec_field_info[j].offset, j);
@@ -184,13 +184,13 @@ char* CModelRtLoader::assembleObjs(const CBuffer& buf, int record_num, const str
 
 void CModelRtLoader::loadModelFromRtdb(CModelContainer& container, const string& app_str, const int& app_no)
 {
-	IPropertyInfo::PropertyTypeInfoMap& appProperty = CConfigurationInfo::getInst()->getAppProperty(app_str);
-	IPropertyInfo::PropertyTypeInfoMapIterator it;
-	for (it = appProperty.begin(); it != appProperty.end(); it++)
+	IPropertyInfo::ObjPropertyInfoMap& objPropertys = CConfigurationInfo::getInst()->getObjPropertyByApp(app_str);
+	IPropertyInfo::ObjPropertyInfoMapIterator it;
+	for (it = objPropertys.begin(); it != objPropertys.end(); it++)
 	{
 		CModelObj::ObjType obj_type = it->first;
 		vector<int> vec_fields;
-		CPropertyInfo* p = dynamic_cast<CPropertyInfo*>(it->second["tab"]);
+		CPropertyInfo* p = dynamic_cast<CPropertyInfo*>(it->second["tab_no"]);
 		int tab = p->tabNo();
 		printf("tab_no is %d \n", tab);
 		IPropertyInfo::PropertyInfoMap pinfo = it->second;
@@ -199,14 +199,12 @@ void CModelRtLoader::loadModelFromRtdb(CModelContainer& container, const string&
 		for (itp = pinfo.begin(); itp != pinfo.end(); itp++)
 		{
 			p = dynamic_cast<CPropertyInfo*>(itp->second);
-			if (p->name() == "tab")
+			if (p->name() == "tab_no" || p->name() == "field_num")
 			{
 				continue;
 			}
-			//field_name += p->name();
 			vec_fields.push_back(p->fieldNo());
 			printf("field_name is  %s , field_no  is %d ,len = %d\n", p->name().c_str(), p->fieldNo(), p->len());
-			//record_size += p->len();
 		}
 		static NET_ODB::CTableNet tab_net;
 		tab_net.Open(app_no, tab);
@@ -230,13 +228,13 @@ void CModelRtLoader::loadModelFromRtdb(CModelContainer& container, const string&
 void CModelRtLoader::loadModelFromRtdbByKey(CModelContainer& container, const string& app_str, const int& app_no, const KEY_TYPE& key)
 {
 	int tab_no = GET_TABLE_NO(key);
-	IPropertyInfo::PropertyTypeInfoMap& appProperty = CConfigurationInfo::getInst()->getAppProperty(app_str);
-	IPropertyInfo::PropertyTypeInfoMapIterator it;
-	for (it = appProperty.begin(); it != appProperty.end(); it++)
+	IPropertyInfo::ObjPropertyInfoMap& objPropertys = CConfigurationInfo::getInst()->getObjPropertyByApp(app_str);
+	IPropertyInfo::ObjPropertyInfoMapIterator it;
+	for (it = objPropertys.begin(); it != objPropertys.end(); it++)
 	{
 		CModelObj::ObjType obj_type = it->first;
 		vector<int> vec_fields;
-		CPropertyInfo* p = dynamic_cast<CPropertyInfo*>(it->second["tab"]);
+		CPropertyInfo* p = dynamic_cast<CPropertyInfo*>(it->second["tab_no"]);
 		int tab = p->tabNo();
 		if (tab == tab_no)
 		{
@@ -246,6 +244,10 @@ void CModelRtLoader::loadModelFromRtdbByKey(CModelContainer& container, const st
 			for (itp = pinfo.begin(); itp != pinfo.end(); itp++)
 			{
 				p = dynamic_cast<CPropertyInfo*>(itp->second);
+				if (p->name() == "tab_no" || p->name() == "field_num")
+				{
+					continue;
+				}
 				vec_fields.push_back(p->fieldNo());
 				record_size += p->len();
 			}

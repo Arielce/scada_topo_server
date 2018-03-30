@@ -28,7 +28,7 @@ public:
 	{
 	}
 
-	void setGraph(SCADA_ALG::CGraph* g){m_graph = g;}
+	virtual void setGraph(SCADA_ALG::CGraph* g) = 0;
 	virtual void doService(char* requestBuffer, int requestlen, char** responseBuffer, int* responselen) = 0;
 protected:
 	SCADA_ALG::CGraph* m_graph;

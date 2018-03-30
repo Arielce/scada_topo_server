@@ -23,6 +23,7 @@ void* ServiceBusFunc(char* requestBuffer, int requestlen, char** responseBuffer,
 	it_map = g_mapFuncServ.find(srvid);
 	if (it_map != g_mapFuncServ.end())
 	{
+		printf("find the srvid map to serv\n");
 		it_map->second->doService(requestBuffer + msgOffset, requestlen - msgOffset, responseBuffer, responselen);
 	}
 	else

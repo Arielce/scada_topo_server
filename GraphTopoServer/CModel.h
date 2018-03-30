@@ -1,7 +1,7 @@
 /*
  * CModel.h
  *
- *  Created on: 2018�0�2ê2�0�8�0�01�0�6�0�9
+ *  Created on: 2018锟�0锟�2锚2锟�0锟�8锟�0锟�01锟�0锟�6锟�0锟�9
  *      Author: Ge.Wenlin
  */
 
@@ -13,13 +13,13 @@
 namespace SCADA_ALG
 {
 
-/* 配置信息基类
- * 用来描述模型配置文件中的信息
- * 模型配置文件为XML格式，支持关系模型和图模型的描述
- * 通过_mapKv来保存属性和值
- * 类型PropertyInfoMap表示属性名称和属性信息的映射，属性信息在关系模型配置文件中为一个域的信息，比如id域的信息，包括域名称、长度、是否关键字
- * 类型PropertyTypeInfoMap表示一类模型对象的名称和所有属性信息的映射，比如在关系模型配置文件中可以表示开关和开关的域属性之间的映射
- * 类型PropertyMap表示应用域和该应用域下的所有类型的模型对象属性之间的映射，比如ems和ems下所有设备类型的属性映射*/
+/* 閰嶇疆淇℃伅鍩虹被
+ * 鐢ㄦ潵鎻忚堪妯″瀷閰嶇疆鏂囦欢涓殑淇℃伅
+ * 妯″瀷閰嶇疆鏂囦欢涓篨ML鏍煎紡锛屾敮鎸佸叧绯绘ā鍨嬪拰鍥炬ā鍨嬬殑鎻忚堪
+ * 閫氳繃_mapKv鏉ヤ繚瀛樺睘鎬у拰鍊�
+ * 绫诲瀷PropertyInfoMap琛ㄧず灞炴�у悕绉板拰灞炴�т俊鎭殑鏄犲皠锛屽睘鎬т俊鎭湪鍏崇郴妯″瀷閰嶇疆鏂囦欢涓负涓�涓煙鐨勪俊鎭紝姣斿id鍩熺殑淇℃伅锛屽寘鎷煙鍚嶇О銆侀暱搴︺�佹槸鍚﹀叧閿瓧
+ * 绫诲瀷PropertyTypeInfoMap琛ㄧず涓�绫绘ā鍨嬪璞＄殑鍚嶇О鍜屾墍鏈夊睘鎬т俊鎭殑鏄犲皠锛屾瘮濡傚湪鍏崇郴妯″瀷閰嶇疆鏂囦欢涓彲浠ヨ〃绀哄紑鍏冲拰寮�鍏崇殑鍩熷睘鎬т箣闂寸殑鏄犲皠
+ * 绫诲瀷PropertyMap琛ㄧず搴旂敤鍩熷拰璇ュ簲鐢ㄥ煙涓嬬殑鎵�鏈夌被鍨嬬殑妯″瀷瀵硅薄灞炴�т箣闂寸殑鏄犲皠锛屾瘮濡俥ms鍜宔ms涓嬫墍鏈夎澶囩被鍨嬬殑灞炴�ф槧灏�*/
 class IPropertyInfo
 {
 public:
@@ -33,7 +33,16 @@ public:
 	virtual const string& name() = 0;
 	virtual const bool isKey() = 0;
 	virtual IPropertyInfo& operator()(const string property_name, const string property_value) = 0;
-
+/*
+	void setPropertyType(const string type)
+	{
+		_ptype = type;
+	}
+	string getPropertyType()
+	{
+		return _ptype;
+	}
+*/
 	typedef map<string, string>::const_iterator const_iterator;
 	const_iterator find(const std::string& t) const
 	{
@@ -47,56 +56,56 @@ public:
 	{
 		return _mapKv.end();
 	}
-	bool hasProperty(const std::string& t) const
+	bool hasProperty(const std::string& t)const
 	{
 		return (find(t) != end());
 	}
 
 	typedef map<string, IPropertyInfo*> PropertyInfoMap; //eg. "id" - propertyinfo , "nd" - propertyinfo
-	typedef map<string, PropertyInfoMap> PropertyTypeInfoMap;  //eg. "breaker"
-	typedef map<string, PropertyTypeInfoMap> PropertyMap;  //eg. "ems" - property
+	typedef map<string, PropertyInfoMap> ObjPropertyInfoMap;  //eg. "breaker"
+	typedef map<string, ObjPropertyInfoMap> AppPropertyInfoMap;  //eg. "ems" - property
 
 	typedef map<string, IPropertyInfo*>::iterator PropertyInfoMapIterator;
-	typedef map<string, PropertyInfoMap>::iterator PropertyTypeInfoMapIterator;
-	typedef map<string, PropertyTypeInfoMap>::iterator PropertyMapIterator;
+	typedef map<string, PropertyInfoMap>::iterator ObjPropertyInfoMapIterator;
+	typedef map<string, ObjPropertyInfoMap>::iterator AppPropertyInfoMapIterator;
 protected:
-	map<string, string> _mapKv;  //attribute key-value
+	map<string, string> _mapKv;//attribute key-value
 	//string _ptype;//property type
 };
 
-/*关系库属性描述*/
+/*鍏崇郴搴撳睘鎬ф弿杩�*/
 class CPropertyInfo: public IPropertyInfo
 {
 public:
 	CPropertyInfo();
 	~CPropertyInfo();
 
-	/*域名称*/
+	/*鍩熷悕绉�*/
 	virtual const string& name()
 	{
 		return _name;
 	}
-	/*域类型*/
+	/*鍩熺被鍨�*/
 	const CUDataValue::DATA_TYPE& type()
 	{
 		return _type;
 	}
-	/*是否是节点号域*/
+	/*鏄惁鏄妭鐐瑰彿鍩�*/
 	const bool isLink()
 	{
 		return _isLink;
 	}
-	/*是否是可以表示模型开断的域*/
+	/*鏄惁鏄彲浠ヨ〃绀烘ā鍨嬪紑鏂殑鍩�*/
 	const bool isCb()
 	{
 		return _isCb;
 	}
-	/*是否是关键字域*/
+	/*鏄惁鏄叧閿瓧鍩�*/
 	const bool isKey()
 	{
 		return _isKey;
 	}
-	/*是否外键*/
+	/*鏄惁澶栭敭*/
 	const bool hasParent()
 	{
 		return _hasParent;
@@ -105,12 +114,12 @@ public:
 	{
 		return _len;
 	}
-	/*表号*/
+	/*琛ㄥ彿*/
 	const int tabNo()
 	{
 		return _tabNo;
 	}
-	/*域号*/
+	/*鍩熷彿*/
 	const int fieldNo()
 	{
 		return _fieldNo;
@@ -133,8 +142,8 @@ private:
 	int _tabNo;
 	short _fieldNo;
 };
-/*图库属性描述
- * 暂未实现*/
+/*鍥惧簱灞炴�ф弿杩�
+ * 鏆傛湭瀹炵幇*/
 class CGdbProperty: public IPropertyInfo
 {
 public:
@@ -142,43 +151,43 @@ public:
 	~CGdbProperty();
 };
 
-/*模型对象
- * 用来描述一个具体的应用模型，比如一个特定的开关
- * 通过PropertyNameValueMap属性名称和属性值映射来存储模型的信息
- * 类型ObjType用来表示模型的类型，与IPropertyInfo::PropertyTypeInfoMap的key对应，即与模型描述配置文件中的模型类型对应
- * 必须通过setObjType和setAppType设置应用类型和对象类型，否则无法获得该对象的属性*/
+/*妯″瀷瀵硅薄
+ * 鐢ㄦ潵鎻忚堪涓�涓叿浣撶殑搴旂敤妯″瀷锛屾瘮濡備竴涓壒瀹氱殑寮�鍏�
+ * 閫氳繃PropertyNameValueMap灞炴�у悕绉板拰灞炴�у�兼槧灏勬潵瀛樺偍妯″瀷鐨勪俊鎭�
+ * 绫诲瀷ObjType鐢ㄦ潵琛ㄧず妯″瀷鐨勭被鍨嬶紝涓嶪PropertyInfo::PropertyTypeInfoMap鐨刱ey瀵瑰簲锛屽嵆涓庢ā鍨嬫弿杩伴厤缃枃浠朵腑鐨勬ā鍨嬬被鍨嬪搴�
+ * 蹇呴』閫氳繃setObjType鍜宻etAppType璁剧疆搴旂敤绫诲瀷鍜屽璞＄被鍨嬶紝鍚﹀垯鏃犳硶鑾峰緱璇ュ璞＄殑灞炴��*/
 class CModelObj
 {
 public:
-	typedef map<string, CUDataValue> PropertyNameValueMap;  //property name -- property
+	typedef map<string, CUDataValue> PropertyNameValueMap;  //property name -- property value
 	typedef string ObjType;
 	typedef string AppType;
 
 	CModelObj();
-	CModelObj(const CModelObj& obj);  //拷贝构造函数
+	CModelObj(const CModelObj& obj);  //鎷疯礉鏋勯�犲嚱鏁�
 	~CModelObj();
 
-	/*得到模型的关键字名称*/
+	/*寰楀埌妯″瀷鐨勫叧閿瓧鍚嶇О*/
 	const string& keyName();
-	/*得到模型的关键字值*/
-	CUDataValue keyValue();
-	/*获取该模型的属性，即属性名称-属性信息，比如在关系模型中即为域名称和域属性*/
+	/*寰楀埌妯″瀷鐨勫叧閿瓧鍊�*/
+    CUDataValue keyValue() ;
+	/*鑾峰彇璇ユā鍨嬬殑灞炴�э紝鍗冲睘鎬у悕绉�-灞炴�т俊鎭紝姣斿鍦ㄥ叧绯绘ā鍨嬩腑鍗充负鍩熷悕绉板拰鍩熷睘鎬�*/
 	const IPropertyInfo::PropertyInfoMap& getProperty();
 	void setProperty(IPropertyInfo::PropertyInfoMap& property);
-	/*为模型添加属性和值*/
+	/*涓烘ā鍨嬫坊鍔犲睘鎬у拰鍊�*/
 	CModelObj& operator()(const string pname, const CUDataValue& pvalue);
-	/*通过属性名称获取值*/
+	/*閫氳繃灞炴�у悕绉拌幏鍙栧��*/
 	CUDataValue operator[](const string pname);
-	/*赋值操作符*/
+	/*璧嬪�兼搷浣滅*/
 	CModelObj& operator=(const CModelObj& obj);
-	/*比较两个模型是否一致，关键字值一致即认为一致*/
-	bool operator==(CModelObj& obj);
-	/*设置模型类型，比如“breaker”，从模型信息配置文件中得到*/
+	/*姣旇緝涓や釜妯″瀷鏄惁涓�鑷达紝鍏抽敭瀛楀�间竴鑷村嵆璁や负涓�鑷�*/
+    bool operator==(CModelObj& obj);
+	/*璁剧疆妯″瀷绫诲瀷锛屾瘮濡傗�渂reaker鈥濓紝浠庢ā鍨嬩俊鎭厤缃枃浠朵腑寰楀埌*/
 	void setObjType(const ObjType type)
 	{
 		m_objType = type;
 	}
-	/*设置应用类型，比如“ems”“dms”，从模型信息配置文件中得到*/
+	/*璁剧疆搴旂敤绫诲瀷锛屾瘮濡傗�渆ms鈥濃�渄ms鈥濓紝浠庢ā鍨嬩俊鎭厤缃枃浠朵腑寰楀埌*/
 	void setAppType(const AppType type)
 	{
 		m_appType = type;
@@ -215,11 +224,11 @@ public:
 
 	void debugPrint();
 private:
-	PropertyNameValueMap m_mapProperty; //属性名称-值 e.g "id"-888888888
-	ObjType m_objType; //对象类型"breaker"
-	AppType m_appType; //对象所属的应用，比如ems/dms/other
+	PropertyNameValueMap m_mapProperty; //灞炴�у悕绉�-鍊� e.g "id"-888888888
+	ObjType m_objType; //瀵硅薄绫诲瀷"breaker"
+	AppType m_appType; //瀵硅薄鎵�灞炵殑搴旂敤锛屾瘮濡俥ms/dms/other
 	IPropertyInfo::PropertyInfoMap *m_objProperty;
-	string m_keyName; //关键字名称
+	string m_keyName; //鍏抽敭瀛楀悕绉�
 };
 
 } /* namespace SCADA_ALG */

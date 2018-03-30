@@ -20,8 +20,8 @@ public:
 
 	void loadConfigure(const string& fileName);
 	int getServiceInfo(const string& cmdStr,IPropertyInfo& service_info);
-	int getPropertyInfo(const string& modelCatagory,CPropertyInfo::PropertyTypeInfoMap& property_info);
-	int getAllPropertyInfo(CPropertyInfo::PropertyMap& propertys);
+	int getPropertyInfo(const string& modelCatagory,CPropertyInfo::ObjPropertyInfoMap& property_info);
+	int getAllPropertyInfo(CPropertyInfo::AppPropertyInfoMap& propertys);
 	int getAllServiceInfo(CPropertyInfo::PropertyInfoMap& vecCmdStr);
 
 private:
@@ -31,7 +31,7 @@ private:
 private:
 	//map<string,int> m_mapServicePort;//ems-10098 ; dms-10099 ;...
 	CPropertyInfo::PropertyInfoMap m_mapServiceInfo;
-	CPropertyInfo::PropertyMap m_mapModelProperty;
+	CPropertyInfo::AppPropertyInfoMap m_mapModelProperty;
 	vector<IPropertyInfo*> m_vecPropertyForCleaner;
 
 	QDomDocument *m_qDom;

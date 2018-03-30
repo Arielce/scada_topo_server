@@ -53,9 +53,9 @@ public:
 	/*根据应用类型和对象类型得到该对象类型相应的属性*/
 	IPropertyInfo::PropertyInfoMap& getProperty(const CModelObj::AppType&, const CModelObj::ObjType&);
 	/*根据应用类型得到该应用下所有对象的属性*/
-	IPropertyInfo::PropertyTypeInfoMap& getAppProperty(const CModelObj::AppType&);
+	IPropertyInfo::ObjPropertyInfoMap& getObjPropertyByApp(const CModelObj::AppType&);
 	/*得到所有的属性信息*/
-	IPropertyInfo::PropertyMap& getAllProperty();
+	IPropertyInfo::AppPropertyInfoMap& getAllProperty();
 	/*根据输入的对象属性信息property以及属性信息中的属性名称得到属性值*/
 	const string getAttributeValue(IPropertyInfo::PropertyInfoMap& property, const string& attr_name);
 	/*根据输入的对象属性信息property以及属性信息中的属性名称得到属性指针*/
@@ -66,7 +66,7 @@ private:
     void parseFuncNo(char* buf,vector<int>& vec_out);
 private:
 	CConfigurationInfo();
-	IPropertyInfo::PropertyMap _propertyInfo;
+	IPropertyInfo::AppPropertyInfoMap _propertyInfo;
 };
 
 } /* namespace SCADA_ALG */

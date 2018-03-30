@@ -15,8 +15,8 @@ namespace SCADA_ALG
 {
 
 CPropertyInfo::CPropertyInfo() :
-		_name(""), _type(CUDataValue::C_DATATYPE_DEFAULT), _len(0), _isLink(false), _isCb(false), _isKey(
-				false), _hasParent(false), _tabNo(-1), _fieldNo(-1)
+		_name(""), _type(CUDataValue::C_DATATYPE_DEFAULT), _len(0), _isLink(false), _isCb(false), _isKey(false), _hasParent(false), _tabNo(-1), _fieldNo(
+				-1)
 {
 }
 CPropertyInfo::~CPropertyInfo()
@@ -31,34 +31,75 @@ CPropertyInfo& CPropertyInfo::operator()(const string property_name, const strin
 	}
 	printf("GGGGGG p = %s , v = %s \n", property_name.c_str(), property_value.c_str());
 	_mapKv[property_name] = property_value;
-	short value = 0;
-	std::stringstream s;
-	s << property_value;
-	s >> value;
 	if (property_name == "name")
 	{
 		_name = property_value;
+        map<string,string>::iterator it;
+        it = _mapKv.find("value");
+        if (it != _mapKv.end())
+        {
+            int t = 0;
+            std::stringstream ss;
+            ss << it->second;
+            ss >> t;
+            _tabNo = t;
+        }
+	}
+	else if (property_name == "value")
+	{
+		if (_name == "tab_no")
+		{
+			int t = 0;
+			std::stringstream ss;
+			ss << property_value;
+			ss >> t;
+			_tabNo = t;
+		}
+		else if (_name == "field_num")
+		{
+			//do nothing
+		}
 	}
 	else if (property_name == "key")
 	{
+		short value = 0;
+		std::stringstream ss;
+		ss << property_value;
+		ss >> value;
 		_isKey = value == 1 ? true : false;
 	}
 	else if (property_name == "link")
 	{
+		short value = 0;
+		std::stringstream ss;
+		ss << property_value;
+		ss >> value;
 		_isLink = value == 1 ? true : false;
 	}
 	else if (property_name == "type")
 	{
+		short value = 0;
+		std::stringstream ss;
+		ss << property_value;
+		ss >> value;
 		_type = (CUDataValue::DATA_TYPE) value;
 		_len = CUDataValue::length(_type);
 		printf("WWWWWW len is %d\n", _len);
 	}
 	else if (property_name == "len")
 	{
+		short value = 0;
+		std::stringstream ss;
+		ss << property_value;
+		ss >> value;
 		_len = value;
 	}
 	else if (property_name == "cb")
 	{
+		short value = 0;
+		std::stringstream ss;
+		ss << property_value;
+		ss >> value;
 		_isCb = value == 1 ? true : false;
 	}
 	else if (property_name == "parent")
@@ -67,21 +108,11 @@ CPropertyInfo& CPropertyInfo::operator()(const string property_name, const strin
 	}
 	else if (property_name == "field_no")
 	{
-		short t = 0;
+		short value = 0;
 		std::stringstream ss;
 		ss << property_value;
-		ss >> t;
-		_fieldNo = t;
-	}
-	else if (property_name == "tab")
-	{
-		int t = 0;
-		std::stringstream ss;
-		ss << property_value;
-		ss >> t;
-		_tabNo = t;
-		_name = "tab";
-		return *this;
+		ss >> value;
+		_fieldNo = value;
 	}
 
 	return *this;
@@ -129,8 +160,7 @@ const string& CModelObj::keyName()
 	IPropertyInfo::PropertyInfoMapIterator it;
 	for (it = property.begin(); it != property.end(); it++)
 	{
-		printf("fname is %s ,%d\n", it->second->name().c_str(),
-				it->second->isKey() == true ? 1 : 0);
+		printf("fname is %s ,%d\n", it->second->name().c_str(), it->second->isKey() == true ? 1 : 0);
 		if (it->second->isKey())
 		{
 			m_keyName = it->first;
@@ -172,7 +202,7 @@ CUDataValue CModelObj::operator[](const string pname)
 }
 bool CModelObj::operator==(CModelObj& obj)
 {
-    return this->keyValue() == obj.keyValue();
+	return this->keyValue() == obj.keyValue();
 }
 CModelObj& CModelObj::operator=(const CModelObj& obj)
 {
@@ -191,8 +221,7 @@ void CModelObj::debugPrint()
 {
 	printf("========obj property======%s,%s\n", m_appType.c_str(), m_objType.c_str());
 #if 1
-	IPropertyInfo::PropertyTypeInfoMap &pp = CConfigurationInfo::getInst()->getAppProperty(
-			m_appType);
+	IPropertyInfo::ObjPropertyInfoMap &pp = CConfigurationInfo::getInst()->getObjPropertyByApp(m_appType);
 	//IPropertyInfo::PropertyInfoMap &p = CConfigurationInfo::getInst()->getProperty(m_appType,m_objType);
 	IPropertyInfo::PropertyInfoMap p = getProperty();
 	IPropertyInfo::PropertyInfoMapIterator itp;

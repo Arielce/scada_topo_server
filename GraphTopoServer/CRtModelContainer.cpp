@@ -198,10 +198,6 @@ bool CRtModelContainer::addToGraph(CModelObj& obj, CGraph* graph)
 					}
 					CVertex* opp_v = graph->createVertex(link_id); //创建节点号在图中的点
 					_modelGraphMap[opp_obj].insert(opp_v);
-					//_modelGraphMap[opp_obj].insert(v);
-					//long e_id = parent_id.c_long();
-					//assert(no < 10); //不超过10个子设备
-					//SET_RECORD_ID(e_id, GET_RECORD_ID(e_id) * 10 + no);
 					CEdge* e = fv->createEdgeTo(link_id, opp_id);						//创建pv和opp_v之间的边，边的id为对端设备id
 					_modelGraphMap[it_parent->second].insert(e);						//边都作为父对象对应的图模型，比如线段模型对应两个线端创建的边，变压器模型对应三个绕组创建的三条边
 					e->addLabel(graph->createLabel(it_parent->second->getObjType()));	//将父对象的类型作为边的标签

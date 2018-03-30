@@ -27,7 +27,7 @@ void CPropertyReader::loadConfigure(const string& fileName)
 	_impl->loadConfigure(fileName);
 }
 
-int CPropertyReader::getPropertyInfo(const string& modelCatagory,CPropertyInfo::PropertyTypeInfoMap& propertyInfo)
+int CPropertyReader::getPropertyInfo(const string& modelCatagory,CPropertyInfo::ObjPropertyInfoMap& propertyInfo)
 {
 	return _impl->getPropertyInfo(modelCatagory,propertyInfo);
 	//return property_info.size();
@@ -38,7 +38,7 @@ int CPropertyReader::getServiceInfo(const string& cmdStr,IPropertyInfo& service_
 	return _impl->getServiceInfo(cmdStr,service_info);
 	//return port;
 }
-int CPropertyReader::getAllPropertyInfo(CPropertyInfo::PropertyMap& propertys)
+int CPropertyReader::getAllPropertyInfo(CPropertyInfo::AppPropertyInfoMap& propertys)
 {
 	return _impl->getAllPropertyInfo(propertys);
 }
