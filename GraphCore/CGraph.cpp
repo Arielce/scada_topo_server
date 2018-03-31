@@ -691,7 +691,7 @@ void CGraph::debugPrintGraph()
 			}
 		}
 	}
-	m_vecEdge.clear();
+//	m_vecEdge.clear();
 //free label
 	vector<CLabel*>::iterator it_l = m_vecLabel.begin();
 	for (; it_l != m_vecLabel.end(); it_l++)

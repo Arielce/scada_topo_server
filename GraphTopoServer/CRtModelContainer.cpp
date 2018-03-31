@@ -130,7 +130,7 @@ bool CRtModelContainer::addToGraph(CModelObj& obj, CGraph* graph)
 	}
 	if (fv == NULL)
 	{
-		TRACE("create vertex failed!\n")
+		TRACE("create vertex failed! obj_id = %ld\n",obj_id.c_long());
 ;
 		return false;
 	}

@@ -20,11 +20,14 @@ int CDmsTopoImpl::getConnectedDev(const TRequestDmsTopo& in_para,TRespondDmsTopo
     printf("start to topo\n");
 
     m_graph->debugPrintGraph();
-
+    
+    printf("request id is %ld\n",in_para.vec_key[0]);
     CEdge* e = m_graph->findEdgeById(in_para.vec_key[0]);
-
+    if (e)
+    {
     printf("start v id is %ld\n",e->getStartVertex()->getId());
     printf("end v id is %ld\n",e->getEndVertex()->getId());
+    }
 
 
 

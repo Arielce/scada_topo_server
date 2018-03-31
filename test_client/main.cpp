@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
 
     TRequestDmsTopo req;
     req.req_id = 99;
-    long id = 115967690404790274;
+    long id = 117375065305120943;
     req.vec_key.push_back(id);
 
     char* buf;

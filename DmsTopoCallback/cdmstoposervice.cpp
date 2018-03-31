@@ -11,7 +11,7 @@ const unsigned char g_endian = 0;
 
 
 
-CDmsTopoService::CDmsTopoService()
+CDmsTopoService::CDmsTopoService():m_Impl(NULL)
 {
 
 }

@@ -1,4 +1,5 @@
 #include <QCoreApplication>
+#include <QLibrary>
 #include "CPropertyReader.h"
 #include "CConfigurationInfo.h"
 #include <string>
@@ -36,6 +37,15 @@ int main(int argc, char *argv[])
                 }
             }
         }
+    }
+
+    QLibrary lib("libdmsTopoCallback.so");
+    ret = lib.load();
+    if (!ret)
+    	printf("err:%s\n",lib.errorString().toStdString().c_str());
+    if (!lib.isLoaded())
+    {
+	    printf("loaded failed\n");
     }
 
     //return a.exec();
